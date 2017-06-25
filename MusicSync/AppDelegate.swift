@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var drawerContainer: MMDrawerController?
     var centerViewController: UIViewController?
+    var settingsViewController: UIViewController?
     var centerNav: UINavigationController?
 
 
@@ -27,6 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         centerViewController = mainStoryboard.instantiateViewController(withIdentifier: "MainViewController") as UIViewController
         
         let drawerViewController = mainStoryboard.instantiateViewController(withIdentifier: "DrawerController") as UIViewController
+        
+        settingsViewController = mainStoryboard.instantiateViewController(withIdentifier: "SettingsController") as UIViewController
         
         //let drawerNav = UINavigationController(rootViewController: drawerViewController)
         centerNav = UINavigationController(rootViewController: centerViewController!)
@@ -40,11 +43,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         let drawerButton = MMDrawerBarButtonItem(target: self, action: #selector(onDrawerButtonPressed))
-        centerViewController?.navigationItem.leftBarButtonItem = drawerButton;
-
+        let settingsButton = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(onSettingsButtonPressed))
+        centerViewController?.navigationItem.leftBarButtonItem = drawerButton
+        centerViewController?.navigationItem.rightBarButtonItem = settingsButton
+        
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
         
+        deleteAllData()
         addSomeData()
         
         return true
@@ -76,12 +82,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         drawerContainer?.toggle(MMDrawerSide.left, animated: true, completion: nil)
     }
     
+    func onSettingsButtonPressed() {
+        centerNav?.pushViewController(settingsViewController!, animated: true)
+    }
+    
     func animateDrawer(drawerController: MMDrawerController?, drawerSide: MMDrawerSide, percentVisible: CGFloat) {
         centerNav?.view.alpha = 1 - (percentVisible * 0.5)
         
         //do provided animation
         let block = MMDrawerVisualState.slideVisualStateBlock()
         block?(drawerController, drawerSide, percentVisible)
+    }
+    
+    private func deleteAllData() {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try persistentStoreCoordinator.execute(deleteRequest, with: managedObjectContext)
+        }
+        catch {
+            fatalError("Could not delete data!")
+        }
     }
     
     private func addSomeData() {
@@ -101,9 +123,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         song4.artist = "Artist1"
         
         song1.album = "Album1"
-        song2.title = "Album2"
-        song3.title = "Album3"
-        song4.title = "Album1"
+        song2.album = "Album2"
+        song3.album = "Album3"
+        song4.album = "Album1"
         
         saveContext()
     }

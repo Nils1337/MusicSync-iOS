@@ -11,6 +11,12 @@ import CoreData
 
 class ArtistCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
+    var artist: String?
+    
+    func setData(_ dbResult: NSDictionary) {
+        artist = dbResult[SongTable.artistColumnName] as? String
+        nameLabel.text = artist
+    }
 }
 
 class ArtistsTableViewController: UITableViewController {
@@ -61,8 +67,7 @@ class ArtistsTableViewController: UITableViewController {
         
         let result = object as! NSDictionary
         
-        let nameView = cell.nameLabel!
-        nameView.text! = result["artist"] as! String
+        cell.setData(result)
 
         return cell
     }
@@ -74,15 +79,23 @@ class ArtistsTableViewController: UITableViewController {
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
         request.resultType = .dictionaryResultType
-        request.propertiesToFetch = ["artist"]
-        request.propertiesToGroupBy = ["artist"]
-        request.sortDescriptors = [NSSortDescriptor(key:"artist", ascending: true)]
+        request.propertiesToFetch = [SongTable.artistColumnName]
+        request.propertiesToGroupBy = [SongTable.artistColumnName]
+        request.sortDescriptors = [NSSortDescriptor(key:SongTable.artistColumnName, ascending: true)]
         fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
         do {
             try fetchedController!.performFetch()
         }
         catch {
             fatalError("Failed to fetch entities: \(error)")
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let albumsVC = segue.destination as? AlbumsTableViewController {
+            if let artistCell = sender as? ArtistCell {
+                albumsVC.artist = artistCell.artist
+            }
         }
     }
 

@@ -7,45 +7,103 @@
 //
 
 import UIKit
+import CoreData
+
+class SongCell: UITableViewCell {
+    @IBOutlet weak var titleLabel: UILabel!
+    var song: Song?
+    
+    func setData(_ song: Song) {
+        self.song = song
+        titleLabel.text = song.title
+    }
+}
 
 class SongsTableViewController: UITableViewController {
-
+    
+    var artist: String?
+    var album: String?
+    var playlist: String?
+    var songlist: [String]?
+    
+    var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        self.navigationItem.title = artist
+        loadData()
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
-
+        
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
+        if let frc = fetchedController {
+            return frc.sections!.count
+        }
         return 0
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        guard let sections = self.fetchedController?.sections else {
+            fatalError("No sections in fetchedResultsController")
+        }
+        
+        let sectionInfo = sections[section]
+        return sectionInfo.numberOfObjects
     }
-
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "songCell", for: indexPath) as! SongCell
+        
+        guard let object = self.fetchedController?.object(at: indexPath) else {
+            fatalError("Attempt to configure cell without managed object")
+        }
+        
+        let result = object as! Song
+        
+        cell.setData(result)
+        
         return cell
     }
-    */
+    
+    private func loadData() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let ctx = appDelegate.managedObjectContext
+        
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
+        request.resultType = .managedObjectResultType
+        request.sortDescriptors = [NSSortDescriptor(key:SongTable.titleColumnName, ascending: true)]
+        
+        if let art = artist {
+            if let alb = album {
+                request.predicate = NSPredicate(format: SongTable.artistColumnName + " = %@ AND " + SongTable.albumColumnName + " = %@", art, alb)
+            }
+            else {
+                request.predicate = NSPredicate(format: SongTable.artistColumnName + " = %@", art)
+            }
+        }
+
+        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
+        do {
+            try fetchedController!.performFetch()
+        }
+        catch {
+            fatalError("Failed to fetch entities: \(error)")
+        }
+    }
 
     /*
     // Override to support conditional editing of the table view.

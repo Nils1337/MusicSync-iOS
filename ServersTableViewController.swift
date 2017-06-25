@@ -1,49 +1,47 @@
 //
-//  AlbumsTableViewController.swift
+//  ServersTableViewController.swift
 //  MusicSync
 //
-//  Created by nils on 23.06.17.
+//  Created by nils on 25.06.17.
 //  Copyright © 2017 nils. All rights reserved.
 //
 
 import UIKit
 import CoreData
 
-class AlbumCell: UITableViewCell {
-    var album: String?
-    @IBOutlet weak var nameLabel: UILabel!
+class ServerCell: UITableViewCell {
+    var server: Server?
     
-    func setData(_ dbResult: NSDictionary) {
-        album = dbResult[SongTable.albumColumnName] as? String
-        nameLabel.text = album
+    func setData(_ server: Server) {
+        self.server = server
+        textLabel?.text = server.name
     }
 }
 
-class AlbumsTableViewController: UITableViewController {
+class ServersTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
     
-    var artist: String?
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.title = artist
         loadData()
-
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(onAddButtonPressed))
+        
+        fetchedController?.delegate = self
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
-
+        
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    // MARK: - Table view data source
-
+    
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -63,14 +61,13 @@ class AlbumsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "albumCell", for: indexPath) as! AlbumCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "serverCell", for: indexPath) as! ServerCell
         
         guard let object = self.fetchedController?.object(at: indexPath) else {
             fatalError("Attempt to configure cell without managed object")
         }
         
-        let result = object as! NSDictionary
-        
+        let result = object as! Server
         cell.setData(result)
         
         return cell
@@ -81,12 +78,9 @@ class AlbumsTableViewController: UITableViewController {
         
         let ctx = appDelegate.managedObjectContext
         
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
-        request.resultType = .dictionaryResultType
-        request.propertiesToFetch = [SongTable.albumColumnName]
-        request.propertiesToGroupBy = [SongTable.albumColumnName]
-        request.sortDescriptors = [NSSortDescriptor(key:SongTable.albumColumnName, ascending: true)]
-        request.predicate = NSPredicate(format: SongTable.artistColumnName + " = %@", artist!)
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Server")
+        request.resultType = .managedObjectResultType
+        request.sortDescriptors = [NSSortDescriptor(key:ServerTable.nameColumnName, ascending: true)]
         fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
         do {
             try fetchedController!.performFetch()
@@ -97,14 +91,30 @@ class AlbumsTableViewController: UITableViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let songVC = segue.destination as? SongsTableViewController {
-            songVC.artist = artist
-            if let albumCell = sender as? AlbumCell {
-                songVC.album = albumCell.album
+        if let serverVC = segue.destination as? ServerDetailViewController {
+            if let serverCell = sender as? ServerCell {
+                serverVC.server = serverCell.server
             }
         }
     }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        self.tableView.reloadData()
+    }
+    
+    func onEditButtonPressed() {
+        self.tableView.setEditing(true, animated: true)
+    }
+    
+    func onAddButtonPressed() {
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "ServerDetailViewController")
+        self.navigationController?.pushViewController(vc!, animated: true)
+    }
 
+    @IBAction func unwindToServers(segue: UIStoryboardSegue) {
+        
+    }
+    
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
