@@ -1,56 +1,55 @@
 //
-//  ServersTableViewController.swift
+//  LibraryTableViewController.swift
 //  MusicSync
 //
-//  Created by nils on 25.06.17.
+//  Created by nils on 28.06.17.
 //  Copyright © 2017 nils. All rights reserved.
 //
 
 import UIKit
 import CoreData
 
-class ServerCell: UITableViewCell {
-    var server: Server?
+class LibraryCell: UITableViewCell {
     
-    func setData(_ server: Server) {
-        self.server = server
-        textLabel?.text = server.name
+    @IBOutlet weak var nameLabel: UILabel!
+    var library: Library?
+    
+    func setData(_ library: Library) {
+        self.library = library
+        nameLabel.text = library.name
     }
 }
 
-class ServersTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
-    
+class LibraryTableViewController: UITableViewController {
+
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
         loadData()
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(onAddButtonPressed))
-        
-        fetchedController?.delegate = self
-        
+
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
-        
+
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
     // MARK: - Table view data source
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         if let frc = fetchedController {
             return frc.sections!.count
         }
         return 0
     }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let sections = self.fetchedController?.sections else {
             fatalError("No sections in fetchedResultsController")
@@ -59,29 +58,32 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
         let sectionInfo = sections[section]
         return sectionInfo.numberOfObjects
     }
-    
+
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "serverCell", for: indexPath) as! ServerCell
-        
-        guard let object = self.fetchedController?.object(at: indexPath) else {
-            fatalError("Attempt to configure cell without managed object")
-        }
-        
-        let result = object as! Server
-        cell.setData(result)
-        
-        return cell
+     let cell = tableView.dequeueReusableCell(withIdentifier: "serverCell", for: indexPath) as! LibraryCell
+     
+     guard let object = self.fetchedController?.object(at: indexPath) else {
+     fatalError("Attempt to configure cell without managed object")
+     }
+     
+     let result = object as! Library
+     cell.setData(result)
+     
+     return cell
     }
-    
+ 
     private func loadData() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        let ctx = appDelegate.dataStack.mainContext
+        let ctx = appDelegate.managedObjectContext
         
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Server")
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
         request.resultType = .managedObjectResultType
-        request.sortDescriptors = [NSSortDescriptor(key:ServerTable.nameColumnName, ascending: true)]
-        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
+        let s1 = NSSortDescriptor(key: LibraryTable.serverColumnName, ascending: true)
+        let s2 = NSSortDescriptor(key:LibraryTable.nameColumnName, ascending: true)
+        request.sortDescriptors = [s1, s2]
+        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: LibraryTable.serverColumnName, cacheName: nil)
         do {
             try fetchedController!.performFetch()
         }
@@ -90,41 +92,10 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let serverVC = segue.destination as? ServerDetailViewController {
-            if let serverCell = sender as? ServerCell {
-                serverVC.server = serverCell.server
-            }
-        }
+    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        return ["test"]
     }
     
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.reloadData()
-    }
-    
-    func onEditButtonPressed() {
-        self.tableView.setEditing(true, animated: true)
-    }
-    
-    func onAddButtonPressed() {
-        let vc = self.storyboard?.instantiateViewController(withIdentifier: "ServerDetailViewController")
-        self.navigationController?.pushViewController(vc!, animated: true)
-    }
-
-    @IBAction func unwindToServers(segue: UIStoryboardSegue) {
-        
-    }
-    
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
-        return cell
-    }
-    */
-
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

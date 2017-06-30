@@ -9,16 +9,25 @@
 import UIKit
 import MMDrawerController
 import CoreData
+import Sync
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    let synchronizeQueue = OperationQueue()
+    let dataStack = DataStack(modelName: "DataModel")
+    
     var window: UIWindow?
     var drawerContainer: MMDrawerController?
     var centerViewController: UIViewController?
     var settingsViewController: UIViewController?
     var centerNav: UINavigationController?
+    
+    var server: Server?
+    var library: Library?
 
+    let serverKey = "server"
+    let libraryKey = "library"
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -64,6 +73,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        let defaults = UserDefaults.standard
+        defaults.set(server, forKey: serverKey)
+        defaults.set(library, forKey: libraryKey)
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -72,6 +84,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        let defaults = UserDefaults.standard
+        server = defaults.object(forKey: serverKey) as? Server
+        library = defaults.object(forKey: libraryKey) as? Library
+        startSynchronization()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -95,15 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func deleteAllData() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        
-        do {
-            try persistentStoreCoordinator.execute(deleteRequest, with: managedObjectContext)
-        }
-        catch {
-            fatalError("Could not delete data!")
-        }
+        dataStack.drop()
     }
     
     private func addSomeData() {
@@ -130,10 +138,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         saveContext()
     }
     
+    private func startSynchronization() {
+        let op = SynchronizeOperation(server)
+        synchronizeQueue.addOperation(op)
+    }
+    
     
     // MARK: - Core Data stack
     // no PersistenceContext because I want to support iOS 9
-    
+/*
     lazy var applicationDocumentsDirectory: URL = {
         // The directory the application uses to store the Core Data store file. This code uses a directory named "com.cadiridris.coreDataTemplate" in the application's documents Application Support directory.
         let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
@@ -195,7 +208,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-
+*/
 
 }
 

@@ -17,3 +17,8 @@ struct SongTable {
 struct ServerTable {
     static let nameColumnName = "name"
 }
+
+struct LibraryTable {
+    static let nameColumnName = "name"
+    static let serverColumnName = "server"
+}

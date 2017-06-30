@@ -7,7 +7,8 @@ target 'MusicSync' do
 
   # Pods for MusicSync
   pod 'MMDrawerController'
-
+  pod 'Sync', '~> 3'
+  
   target 'MusicSyncTests' do
     #inherit! :search_paths‚
     # Pods for testing
