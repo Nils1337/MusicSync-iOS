@@ -15,6 +15,8 @@ import Sync
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     let synchronizeQueue = OperationQueue()
+    let dataFetchQueue = OperationQueue()
+    
     let dataStack = DataStack(modelName: "DataModel")
     
     var window: UIWindow?
@@ -59,8 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
         
-        deleteAllData()
-        addSomeData()
+        //dataStack.drop()
         
         return true
     }
@@ -76,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaults = UserDefaults.standard
         defaults.set(server, forKey: serverKey)
         defaults.set(library, forKey: libraryKey)
+        dataFetchQueue.removeObserver(self, forKeyPath: "operationCount")
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -87,7 +89,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaults = UserDefaults.standard
         server = defaults.object(forKey: serverKey) as? Server
         library = defaults.object(forKey: libraryKey) as? Library
-        startSynchronization()
+        
+        dataFetchQueue.addObserver(self, forKeyPath: "operationCount", options: .new, context: nil)
+        synchronizeWithCurrentServer()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -110,15 +114,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         block?(drawerController, drawerSide, percentVisible)
     }
     
-    private func deleteAllData() {
-        dataStack.drop()
-    }
-    
     private func addSomeData() {
-        let song1 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: managedObjectContext) as! Song
-        let song2 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: managedObjectContext) as! Song
-        let song3 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: managedObjectContext) as! Song
-        let song4 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: managedObjectContext) as! Song
+        
+        let ctx = dataStack.mainContext
+        
+        let song1 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
+        let song2 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
+        let song3 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
+        let song4 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
         
         song1.title = "Song1"
         song2.title = "Song2"
@@ -138,11 +141,49 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         saveContext()
     }
     
-    private func startSynchronization() {
-        let op = SynchronizeOperation(server)
-        synchronizeQueue.addOperation(op)
+    func synchronizeWithCurrentServer() {
+        if server == nil && library == nil {
+            dataFetchQueue.addOperation {
+                let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Server")
+                let result = try? self.dataStack.mainContext.fetch(request)
+                self.server = result?.first as? Server
+                
+                let request2 = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
+                let result2 = try? self.dataStack.mainContext.fetch(request2)
+                self.library = result2?.first as? Library
+            }
+        }
+        else if library == nil {
+            dataFetchQueue.addOperation {
+                let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
+                let result = try? self.dataStack.mainContext.fetch(request)
+                self.library = result?.first as? Library
+            }
+            
+        }
+        else {
+            synchronize(with: server!)
+        }
     }
     
+    
+    func synchronize(with server: Server) {
+        let op = SynchronizeOperation(server)
+        
+        print("Synchronization started with server: " + server.name!)
+        
+        synchronizeQueue.addOperation(op)
+        
+        if self.server == nil {
+            self.server = server
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if ((object as? OperationQueue) != nil) && change?[.newKey] as! Int == 0 {
+            synchronizeWithCurrentServer()
+        }
+    }
     
     // MARK: - Core Data stack
     // no PersistenceContext because I want to support iOS 9
@@ -193,11 +234,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     
     // MARK: - Core Data Saving support
-    
+*/
     func saveContext () {
-        if managedObjectContext.hasChanges {
+        if dataStack.mainContext.hasChanges {
             do {
-                try managedObjectContext.save()
+                try dataStack.mainContext.save()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
                 // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -208,7 +249,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-*/
 
 }
 

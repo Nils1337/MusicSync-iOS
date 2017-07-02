@@ -43,7 +43,7 @@ class ServerDetailViewController: UIViewController {
     func onDoneButtonPressed() {
         
         if server == nil {
-            let ctx = appDelegate.managedObjectContext
+            let ctx = appDelegate.dataStack.mainContext
             server = NSEntityDescription.insertNewObject(forEntityName: "Server", into: ctx) as? Server
         }
         
@@ -52,6 +52,7 @@ class ServerDetailViewController: UIViewController {
         server!.port = Int16(portField.text!)!
         
         appDelegate.saveContext()
+        appDelegate.synchronize(with: server!)
         performSegue(withIdentifier: "unwindToServers", sender: self)
     }
     

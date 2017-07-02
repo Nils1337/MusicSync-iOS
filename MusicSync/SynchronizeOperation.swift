@@ -7,8 +7,12 @@
 //
 
 import Foundation
+import UIKit
+import Sync
 
 class SynchronizeOperation: Operation {
+    
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     let songUrl = "/songs"
     let libraryUrl = "/libraries"
@@ -23,14 +27,17 @@ class SynchronizeOperation: Operation {
             print("Current Server is null!")
             return
         }
-        print("operation invoked!")
+        
+        getSongs()
+        getLibraries()
     }
     
     func getSongs() {
-        let url = URL(string: "http://" + server!.url! + ":" + String(server!.port) + songUrl)
+        let s = "http://" + server!.url! + ":" + String(server!.port) + songUrl
+        let url = URL(string: s)
         let request = URLRequest(url: url!)
         let session = URLSession.shared
-        session.dataTask(with: request) {
+        let task = session.dataTask(with: request) {
             (data: Data?, response: URLResponse?, error: Error?) in
             
             guard error == nil else {
@@ -51,18 +58,22 @@ class SynchronizeOperation: Operation {
                 }
             }
         }
+        
+        task.resume()
     }
     
     func saveSongs(_ data: Data) {
         let json = try? JSONSerialization.jsonObject(with: data, options: [])
-        let song = Song(JSONString: json.toString())
+        let sync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Song", predicate: nil, dataStack: appDelegate.dataStack)
+        sync.delegate = SongDelegate(self)
+        sync.start()
     }
     
     func getLibraries() {
         let url = URL(string: "http://" + server!.url! + ":" + String(server!.port) + libraryUrl)
         let request = URLRequest(url: url!)
         let session = URLSession.shared
-        session.dataTask(with: request) {
+        let task = session.dataTask(with: request) {
             (data: Data?, response: URLResponse?, error: Error?) in
             
             guard error == nil else {
@@ -71,15 +82,66 @@ class SynchronizeOperation: Operation {
                 return
             }
             
+            guard data != nil else {
+                //TODO
+                print("no data received from server!")
+                return
+            }
+            
             if let r = response as? HTTPURLResponse {
                 if (r.statusCode == 200) {
-                    self.saveLibraries(data)
+                    self.saveLibraries(data!)
                 }
             }
         }
+        
+        task.resume()
     }
     
-    func saveLibraries(_ data: Data?) {
+    func saveLibraries(_ data: Data) {
+        let json = try? JSONSerialization.jsonObject(with: data, options: [])
+        let sync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Library", predicate: nil, dataStack: appDelegate.dataStack)
+        sync.delegate = LibraryDelegate(self)
+        sync.start()
         
+        /*appDelegate.dataStack.sync(json as! [[String : Any]], inEntityNamed: "Library") {
+            error in
+            
+            //TODO
+            if error != nil {
+                print(error!.localizedDescription)
+            }
+            else {
+                print("Successfully synced libraries!")
+            }
+        }*/
     }
 }
+
+class LibraryDelegate: SyncDelegate {
+    
+    var syncOp: SynchronizeOperation
+    
+    init(_ syncOp: SynchronizeOperation) {
+        self.syncOp = syncOp
+    }
+    
+    func sync(_ sync: Sync, willInsert json: [String : Any], in entityNamed: String, parent: NSManagedObject?) -> [String : Any] {
+        var update = json
+        update.updateValue(syncOp.server!.id, forKey: LibraryTable.serverColumnName)
+        return update
+    }
+}
+
+class SongDelegate: SyncDelegate {
+    var syncOp: SynchronizeOperation
+    
+    init(_ syncOp: SynchronizeOperation) {
+        self.syncOp = syncOp
+    }
+    
+    func sync(_ sync: Sync, willInsert json: [String : Any], in entityNamed: String, parent: NSManagedObject?) -> [String : Any] {
+        return json
+    }
+}
+

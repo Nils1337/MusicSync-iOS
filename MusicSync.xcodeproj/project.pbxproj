@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2908B6C41F06E615003883CD /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2908B6C31F06E615003883CD /* TabViewController.swift */; };
 		292AE7A21EFFDE400067FABB /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7A11EFFDE400067FABB /* Constants.swift */; };
 		292AE7A41EFFEBBD0067FABB /* ArtistsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7A31EFFEBBD0067FABB /* ArtistsTableViewController.swift */; };
 		292AE7A71EFFF5850067FABB /* SongsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7A61EFFF5850067FABB /* SongsTableViewController.swift */; };
@@ -48,6 +49,7 @@
 
 /* Begin PBXFileReference section */
 		03CA914FCBD68974E35E3637 /* Pods_MusicSyncUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MusicSyncUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2908B6C31F06E615003883CD /* TabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		292AE7A11EFFDE400067FABB /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		292AE7A31EFFEBBD0067FABB /* ArtistsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistsTableViewController.swift; sourceTree = "<group>"; };
 		292AE7A61EFFF5850067FABB /* SongsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongsTableViewController.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				292AE7A81F002AD00067FABB /* ServersTableViewController.swift */,
 				292AE7AC1F0031510067FABB /* ServerDetailViewController.swift */,
 				292AE7AE1F03FA980067FABB /* LibraryTableViewController.swift */,
+				2908B6C31F06E615003883CD /* TabViewController.swift */,
 			);
 			name = Controller;
 			path = ..;
@@ -507,6 +510,7 @@
 				296835381EC487E7004BCA50 /* AppDelegate.swift in Sources */,
 				292AE7A91F002AD00067FABB /* ServersTableViewController.swift in Sources */,
 				292AE7A71EFFF5850067FABB /* SongsTableViewController.swift in Sources */,
+				2908B6C41F06E615003883CD /* TabViewController.swift in Sources */,
 				296835BD1EFD40CA004BCA50 /* AlbumsTableViewController.swift in Sources */,
 				292AE7AF1F03FA980067FABB /* LibraryTableViewController.swift in Sources */,
 				292AE7B21F06B3460067FABB /* SynchronizeOperation.swift in Sources */,

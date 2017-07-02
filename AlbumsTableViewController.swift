@@ -79,7 +79,7 @@ class AlbumsTableViewController: UITableViewController {
     private func loadData() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        let ctx = appDelegate.managedObjectContext
+        let ctx = appDelegate.dataStack.mainContext
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
         request.resultType = .dictionaryResultType

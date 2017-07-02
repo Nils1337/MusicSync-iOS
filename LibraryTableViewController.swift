@@ -61,10 +61,10 @@ class LibraryTableViewController: UITableViewController {
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-     let cell = tableView.dequeueReusableCell(withIdentifier: "serverCell", for: indexPath) as! LibraryCell
+     let cell = tableView.dequeueReusableCell(withIdentifier: "libraryCell", for: indexPath) as! LibraryCell
      
      guard let object = self.fetchedController?.object(at: indexPath) else {
-     fatalError("Attempt to configure cell without managed object")
+        fatalError("Attempt to configure cell without managed object")
      }
      
      let result = object as! Library
@@ -76,14 +76,14 @@ class LibraryTableViewController: UITableViewController {
     private func loadData() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        let ctx = appDelegate.managedObjectContext
+        let ctx = appDelegate.dataStack.mainContext
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
         request.resultType = .managedObjectResultType
         let s1 = NSSortDescriptor(key: LibraryTable.serverColumnName, ascending: true)
         let s2 = NSSortDescriptor(key:LibraryTable.nameColumnName, ascending: true)
         request.sortDescriptors = [s1, s2]
-        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: LibraryTable.serverColumnName, cacheName: nil)
+        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: LibraryTable.serverColumnName + "." + ServerTable.nameColumnName, cacheName: nil)
         do {
             try fetchedController!.performFetch()
         }
@@ -92,8 +92,9 @@ class LibraryTableViewController: UITableViewController {
         }
     }
     
-    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return ["test"]
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let sectionInfo = fetchedController?.sections?[section]
+        return sectionInfo?.name
     }
     
     /*
