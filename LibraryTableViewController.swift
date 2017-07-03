@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class LibraryCell: UITableViewCell {
+class LibraryCell: UITableViewCell, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var nameLabel: UILabel!
     var library: Library?
@@ -20,7 +20,7 @@ class LibraryCell: UITableViewCell {
     }
 }
 
-class LibraryTableViewController: UITableViewController {
+class LibraryTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
 
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
 
@@ -28,7 +28,8 @@ class LibraryTableViewController: UITableViewController {
         super.viewDidLoad()
         
         loadData()
-
+        fetchedController?.delegate = self
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -68,6 +69,9 @@ class LibraryTableViewController: UITableViewController {
      }
      
      let result = object as! Library
+        if (result.server != nil) {
+            print(result.server!.name!)
+        }
      cell.setData(result)
      
      return cell
@@ -83,7 +87,7 @@ class LibraryTableViewController: UITableViewController {
         let s1 = NSSortDescriptor(key: LibraryTable.serverColumnName, ascending: true)
         let s2 = NSSortDescriptor(key:LibraryTable.nameColumnName, ascending: true)
         request.sortDescriptors = [s1, s2]
-        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: LibraryTable.serverColumnName + "." + ServerTable.nameColumnName, cacheName: nil)
+        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: #keyPath(Library.server), cacheName: nil)
         do {
             try fetchedController!.performFetch()
         }
@@ -95,6 +99,10 @@ class LibraryTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let sectionInfo = fetchedController?.sections?[section]
         return sectionInfo?.name
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        self.tableView.reloadData()
     }
     
     /*

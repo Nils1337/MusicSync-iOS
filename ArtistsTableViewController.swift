@@ -19,15 +19,17 @@ class ArtistCell: UITableViewCell {
     }
 }
 
-class ArtistsTableViewController: UITableViewController {
+class ArtistsTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
     
-    var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
+    var artists = [NSDictionary]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         loadData()
-
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(synchronizationFinished), name: NSNotification.Name("SongsSynchronized"), object: nil)
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -43,30 +45,17 @@ class ArtistsTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        if let frc = fetchedController {
-            return frc.sections!.count
-        }
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let sections = self.fetchedController?.sections else {
-            fatalError("No sections in fetchedResultsController")
-        }
-        
-        let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        return artists.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "artistCell", for: indexPath) as! ArtistCell
 
-        guard let object = self.fetchedController?.object(at: indexPath) else {
-            fatalError("Attempt to configure cell without managed object")
-        }
-        
-        let result = object as! NSDictionary
-        
+        let result = artists[indexPath.item]
         cell.setData(result)
 
         return cell
@@ -80,15 +69,10 @@ class ArtistsTableViewController: UITableViewController {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
         request.resultType = .dictionaryResultType
         request.propertiesToFetch = [SongTable.artistColumnName]
-        request.propertiesToGroupBy = [SongTable.artistColumnName]
+        request.returnsDistinctResults = true
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.artistColumnName, ascending: true)]
-        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
-        do {
-            try fetchedController!.performFetch()
-        }
-        catch {
-            fatalError("Failed to fetch entities: \(error)")
-        }
+        artists = try! ctx.fetch(request) as! [NSDictionary]
+        self.tableView.reloadData()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -96,6 +80,12 @@ class ArtistsTableViewController: UITableViewController {
             if let artistCell = sender as? ArtistCell {
                 albumsVC.artist = artistCell.artist
             }
+        }
+    }
+    
+    func synchronizationFinished() {
+        OperationQueue.main.addOperation {
+            self.loadData()
         }
     }
 

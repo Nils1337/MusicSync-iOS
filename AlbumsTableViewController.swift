@@ -22,13 +22,15 @@ class AlbumCell: UITableViewCell {
 class AlbumsTableViewController: UITableViewController {
     
     var artist: String?
-    var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
+    var albums = [NSDictionary]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationItem.title = artist
         loadData()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(synchronizationFinished), name: NSNotification.Name("SongsSynchronized"), object: nil)
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -47,35 +49,29 @@ class AlbumsTableViewController: UITableViewController {
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        if let frc = fetchedController {
-            return frc.sections!.count
-        }
-        return 0
+        return 1
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let sections = self.fetchedController?.sections else {
-            fatalError("No sections in fetchedResultsController")
-        }
-        
-        let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        return albums.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "albumCell", for: indexPath) as! AlbumCell
         
-        guard let object = self.fetchedController?.object(at: indexPath) else {
-            fatalError("Attempt to configure cell without managed object")
-        }
-        
-        let result = object as! NSDictionary
+        let result = albums[indexPath.item]
         
         cell.setData(result)
         
         return cell
     }
     
+    func synchronizationFinished() {
+        OperationQueue.main.addOperation {
+            self.loadData()
+        }
+    }
+
     private func loadData() {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
@@ -87,13 +83,8 @@ class AlbumsTableViewController: UITableViewController {
         request.propertiesToGroupBy = [SongTable.albumColumnName]
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.albumColumnName, ascending: true)]
         request.predicate = NSPredicate(format: SongTable.artistColumnName + " = %@", artist!)
-        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
-        do {
-            try fetchedController!.performFetch()
-        }
-        catch {
-            fatalError("Failed to fetch entities: \(error)")
-        }
+        albums = try! ctx.fetch(request) as! [NSDictionary]
+        self.tableView.reloadData()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

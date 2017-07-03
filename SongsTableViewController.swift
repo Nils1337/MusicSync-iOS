@@ -19,7 +19,7 @@ class SongCell: UITableViewCell {
     }
 }
 
-class SongsTableViewController: UITableViewController {
+class SongsTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
     
     var artist: String?
     var album: String?
@@ -33,6 +33,7 @@ class SongsTableViewController: UITableViewController {
         
         self.navigationItem.title = artist
         loadData()
+        fetchedController?.delegate = self
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -105,6 +106,10 @@ class SongsTableViewController: UITableViewController {
         }
     }
 
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        self.tableView.reloadData()
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

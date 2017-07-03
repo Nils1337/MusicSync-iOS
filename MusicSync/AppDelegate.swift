@@ -16,7 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     let synchronizeQueue = OperationQueue()
     let dataFetchQueue = OperationQueue()
-    
+    var dataFetchObserver: DataFetchObserver?
+
     let dataStack = DataStack(modelName: "DataModel")
     
     var window: UIWindow?
@@ -61,8 +62,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
         
-        //dataStack.drop()
+        dataStack.drop()
         
+        dataFetchObserver = DataFetchObserver(self)
+
         return true
     }
 
@@ -77,8 +80,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaults = UserDefaults.standard
         defaults.set(server, forKey: serverKey)
         defaults.set(library, forKey: libraryKey)
-        dataFetchQueue.removeObserver(self, forKeyPath: "operationCount")
-    }
+        //dataFetchQueue.operations.count
+        dataFetchQueue.removeObserver(dataFetchObserver!, forKeyPath: "operationCount")
+   }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
@@ -90,7 +94,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         server = defaults.object(forKey: serverKey) as? Server
         library = defaults.object(forKey: libraryKey) as? Library
         
-        dataFetchQueue.addObserver(self, forKeyPath: "operationCount", options: .new, context: nil)
+        dataFetchQueue.addObserver(dataFetchObserver!, forKeyPath: "operationCount", options: .new, context: nil)
         synchronizeWithCurrentServer()
     }
 
@@ -250,5 +254,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 
+}
+
+class DataFetchObserver: NSObject {
+    var delegate: AppDelegate
+    
+    init(_ delegate: AppDelegate) {
+        self.delegate = delegate
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if ((object as? OperationQueue) != nil) && change?[.newKey] as! Int == 0 {
+            delegate.synchronizeWithCurrentServer()
+        }
+    }
 }
 
