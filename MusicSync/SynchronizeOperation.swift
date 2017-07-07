@@ -70,11 +70,13 @@ class SynchronizeOperation: Operation {
     func saveSongs(_ data: Data) {
         let json = try? JSONSerialization.jsonObject(with: data, options: [])
         songSync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Song", predicate: nil, dataStack: appDelegate.dataStack)
-        songSync?.delegate = SongDelegate(self)
-        songSync?.start()
         
-        //We're already in a background thread so we can wait here until synchronization is finished
-        songSync?.waitUntilFinished()
+        //need to keep reference to delegate here because for some reason its a weak reference in Sync class...
+        let delegate = SongDelegate(self)
+        songSync?.delegate = delegate
+        
+        //run sync operation synchronously
+        songSync?.start()
 
         print("Songs successfully synced!")
         NotificationCenter.default.post(name: NSNotification.Name("SongsSynchronized"), object: nil)
@@ -118,11 +120,13 @@ class SynchronizeOperation: Operation {
     func saveLibraries(_ data: Data) {
         let json = try? JSONSerialization.jsonObject(with: data, options: [])
         librarySync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Library", predicate: nil, dataStack: appDelegate.dataStack)
-        librarySync?.delegate = LibraryDelegate(self)
-        librarySync?.start()
         
-        //We're already in a background thread so we can wait here until synchronization is finished
-        librarySync?.waitUntilFinished()
+        //need to keep reference to delegate here because for some reason its a weak reference in Sync class...
+        let delegate = LibraryDelegate(self)
+        librarySync?.delegate = delegate
+        
+        //run sync operation synchronously
+        librarySync?.start()
 
         print("Libraries successfully synced!")
         NotificationCenter.default.post(name: NSNotification.Name("LibrariesSynchronized"), object: nil)
@@ -139,9 +143,11 @@ class LibraryDelegate: SyncDelegate {
     
     func sync(_ sync: Sync, willInsert json: [String : Any], in entityNamed: String, parent: NSManagedObject?) -> [String : Any] {
         
-        //add server id to library entity
+        //copy dictionary because passed one is immutable
         var update = json
-        update.updateValue(syncOp.server!.id, forKey: LibraryTable.serverColumnName)
+
+        //add server id to library entity
+        update.updateValue(syncOp.server!.name!, forKey: LibraryTable.serverColumnName + "_id")
         return update
     }
 }

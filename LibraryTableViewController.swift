@@ -62,19 +62,21 @@ class LibraryTableViewController: UITableViewController, NSFetchedResultsControl
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-     let cell = tableView.dequeueReusableCell(withIdentifier: "libraryCell", for: indexPath) as! LibraryCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "libraryCell", for: indexPath) as! LibraryCell
      
-     guard let object = self.fetchedController?.object(at: indexPath) else {
-        fatalError("Attempt to configure cell without managed object")
-     }
+        guard let object = self.fetchedController?.object(at: indexPath) else {
+            fatalError("Attempt to configure cell without managed object")
+        }
      
-     let result = object as! Library
+        let result = object as! Library
+        
+        print("Adding Cell for Library: ")
+        print(" name: " + result.name! + " server: " + result.server!.name!)
         if (result.server != nil) {
             print(result.server!.name!)
         }
-     cell.setData(result)
-     
-     return cell
+        cell.setData(result)
+        return cell
     }
  
     private func loadData() {

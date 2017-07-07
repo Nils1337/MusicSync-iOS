@@ -15,6 +15,7 @@
 		292AE7AD1F0031510067FABB /* ServerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7AC1F0031510067FABB /* ServerDetailViewController.swift */; };
 		292AE7AF1F03FA980067FABB /* LibraryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7AE1F03FA980067FABB /* LibraryTableViewController.swift */; };
 		292AE7B21F06B3460067FABB /* SynchronizeOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7B11F06B3460067FABB /* SynchronizeOperation.swift */; };
+		2963B1601F0FC093009857CE /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2963B15F1F0FC093009857CE /* SettingsTableViewController.swift */; };
 		296835381EC487E7004BCA50 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296835371EC487E7004BCA50 /* AppDelegate.swift */; };
 		2968353F1EC487E7004BCA50 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2968353D1EC487E7004BCA50 /* Main.storyboard */; };
 		296835411EC487E7004BCA50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 296835401EC487E7004BCA50 /* Assets.xcassets */; };
@@ -57,6 +58,7 @@
 		292AE7AC1F0031510067FABB /* ServerDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerDetailViewController.swift; sourceTree = "<group>"; };
 		292AE7AE1F03FA980067FABB /* LibraryTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryTableViewController.swift; sourceTree = "<group>"; };
 		292AE7B11F06B3460067FABB /* SynchronizeOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SynchronizeOperation.swift; sourceTree = "<group>"; };
+		2963B15F1F0FC093009857CE /* SettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		296835341EC487E7004BCA50 /* MusicSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		296835371EC487E7004BCA50 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2968353E1EC487E7004BCA50 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				292AE7AC1F0031510067FABB /* ServerDetailViewController.swift */,
 				292AE7AE1F03FA980067FABB /* LibraryTableViewController.swift */,
 				2908B6C31F06E615003883CD /* TabViewController.swift */,
+				2963B15F1F0FC093009857CE /* SettingsTableViewController.swift */,
 			);
 			name = Controller;
 			path = ..;
@@ -512,6 +515,7 @@
 				292AE7A71EFFF5850067FABB /* SongsTableViewController.swift in Sources */,
 				2908B6C41F06E615003883CD /* TabViewController.swift in Sources */,
 				296835BD1EFD40CA004BCA50 /* AlbumsTableViewController.swift in Sources */,
+				2963B1601F0FC093009857CE /* SettingsTableViewController.swift in Sources */,
 				292AE7AF1F03FA980067FABB /* LibraryTableViewController.swift in Sources */,
 				292AE7B21F06B3460067FABB /* SynchronizeOperation.swift in Sources */,
 				2968356D1EFAD08C004BCA50 /* DataModel.xcdatamodeld in Sources */,

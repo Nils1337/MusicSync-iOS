@@ -16,7 +16,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     let synchronizeQueue = OperationQueue()
     let dataFetchQueue = OperationQueue()
-    var dataFetchObserver: DataFetchObserver?
 
     let dataStack = DataStack(modelName: "DataModel")
     
@@ -63,9 +62,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.makeKeyAndVisible()
         
         dataStack.drop()
-        
-        dataFetchObserver = DataFetchObserver(self)
-
         return true
     }
 
@@ -80,8 +76,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaults = UserDefaults.standard
         defaults.set(server, forKey: serverKey)
         defaults.set(library, forKey: libraryKey)
-        //dataFetchQueue.operations.count
-        dataFetchQueue.removeObserver(dataFetchObserver!, forKeyPath: "operationCount")
    }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -94,7 +88,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         server = defaults.object(forKey: serverKey) as? Server
         library = defaults.object(forKey: libraryKey) as? Library
         
-        dataFetchQueue.addObserver(dataFetchObserver!, forKeyPath: "operationCount", options: .new, context: nil)
         synchronizeWithCurrentServer()
     }
 
@@ -146,27 +139,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func synchronizeWithCurrentServer() {
-        if server == nil && library == nil {
-            dataFetchQueue.addOperation {
-                let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Server")
-                let result = try? self.dataStack.mainContext.fetch(request)
-                self.server = result?.first as? Server
+        if library == nil {
+            let operation = BlockOperation {
+                if self.server == nil {
+                    let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Server")
+                    let result = try? self.dataStack.mainContext.fetch(request)
+                    self.server = result?.first as? Server
+                }
                 
-                let request2 = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
-                let result2 = try? self.dataStack.mainContext.fetch(request2)
-                self.library = result2?.first as? Library
-            }
-        }
-        else if library == nil {
-            dataFetchQueue.addOperation {
                 let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
                 let result = try? self.dataStack.mainContext.fetch(request)
                 self.library = result?.first as? Library
             }
             
+            operation.completionBlock = {
+                if self.server != nil {
+                    self.synchronizeWithCurrentServer()
+                }
+            }
+            
+            dataFetchQueue.addOperation(operation)
         }
         else {
-            synchronize(with: server!)
+            //if library is not nil, server should not be nil as well
+            guard let server = server else {
+                print("Could not synchronize with current server because library is set but server is nil!")
+                return
+            }
+            synchronize(with: server)
         }
     }
     
@@ -180,12 +180,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if self.server == nil {
             self.server = server
-        }
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if ((object as? OperationQueue) != nil) && change?[.newKey] as! Int == 0 {
-            synchronizeWithCurrentServer()
         }
     }
     
@@ -252,21 +246,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-
-
 }
-
-class DataFetchObserver: NSObject {
-    var delegate: AppDelegate
-    
-    init(_ delegate: AppDelegate) {
-        self.delegate = delegate
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if ((object as? OperationQueue) != nil) && change?[.newKey] as! Int == 0 {
-            delegate.synchronizeWithCurrentServer()
-        }
-    }
-}
-
