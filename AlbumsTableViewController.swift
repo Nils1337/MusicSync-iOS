@@ -21,16 +21,21 @@ class AlbumCell: UITableViewCell {
 
 class AlbumsTableViewController: UITableViewController {
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
     var artist: String?
+    var library: Library?
     var albums = [NSDictionary]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationItem.title = artist
+        library = appDelegate.library
         loadData()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(synchronizationFinished), name: NSNotification.Name("SongsSynchronized"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -65,14 +70,15 @@ class AlbumsTableViewController: UITableViewController {
         
         return cell
     }
-    
-    func synchronizationFinished() {
-        OperationQueue.main.addOperation {
-            self.loadData()
-        }
-    }
 
     private func loadData() {
+        
+        guard let library = library, let artist = artist else {
+            albums.removeAll()
+            self.tableView.reloadData()
+            return
+        }
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         let ctx = appDelegate.dataStack.mainContext
@@ -80,21 +86,27 @@ class AlbumsTableViewController: UITableViewController {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
         request.resultType = .dictionaryResultType
         request.propertiesToFetch = [SongTable.albumColumnName]
-        request.propertiesToGroupBy = [SongTable.albumColumnName]
+        request.returnsDistinctResults = true
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.albumColumnName, ascending: true)]
-        request.predicate = NSPredicate(format: SongTable.artistColumnName + " = %@", artist!)
-        albums = try! ctx.fetch(request) as! [NSDictionary]
+        request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", artist, library.localId!)
+        do {
+            albums = try ctx.fetch(request) as! [NSDictionary]
+        }
+        catch {
+            fatalError("Failed to fetch entities: \(error)")
+        }
         self.tableView.reloadData()
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let songVC = segue.destination as? SongsTableViewController {
-            songVC.artist = artist
-            if let albumCell = sender as? AlbumCell {
-                songVC.album = albumCell.album
-            }
+    func reload(_ notification: NSNotification) {
+        if notification.name == Notifications.libraryChangedNotification {
+            library = appDelegate.library
+        }
+        OperationQueue.main.addOperation {
+            self.loadData()
         }
     }
+
 
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -141,14 +153,16 @@ class AlbumsTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if let songVC = segue.destination as? SongsTableViewController {
+            songVC.artist = artist
+            if let albumCell = sender as? AlbumCell {
+                songVC.album = albumCell.album
+            }
+        }
     }
-    */
 
 }

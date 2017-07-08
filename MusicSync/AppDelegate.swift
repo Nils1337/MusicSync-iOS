@@ -22,11 +22,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var drawerContainer: MMDrawerController?
     var centerViewController: UIViewController?
-    var settingsViewController: UIViewController?
-    var centerNav: UINavigationController?
     
-    var server: Server?
-    var library: Library?
+    var server: Server? {
+        didSet(oldValue) {
+            NotificationCenter.default.post(name: Notifications.serverChangedNotification, object: nil)
+        }
+    }
+    var library: Library? {
+        didSet(oldValue) {
+            NotificationCenter.default.post(name: Notifications.libraryChangedNotification, object: nil)
+        }
+    }
 
     let serverKey = "server"
     let libraryKey = "library"
@@ -40,28 +46,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let drawerViewController = mainStoryboard.instantiateViewController(withIdentifier: "DrawerController") as UIViewController
         
-        settingsViewController = mainStoryboard.instantiateViewController(withIdentifier: "SettingsController") as UIViewController
-        
-        //let drawerNav = UINavigationController(rootViewController: drawerViewController)
-        centerNav = UINavigationController(rootViewController: centerViewController!)
-        
-        drawerContainer = MMDrawerController(center: centerNav, leftDrawerViewController: drawerViewController)
+        drawerContainer = MMDrawerController(center: centerViewController, leftDrawerViewController: drawerViewController)
         drawerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.bezelPanningCenterView
         drawerContainer?.closeDrawerGestureModeMask = [MMCloseDrawerGestureMode.panningCenterView, MMCloseDrawerGestureMode.panningDrawerView, MMCloseDrawerGestureMode.tapCenterView]
         drawerContainer?.showsShadow = false
         //drawerContainer?.setDrawerVisualStateBlock(MMDrawerVisualState.slideVisualStateBlock())
         drawerContainer?.setDrawerVisualStateBlock(animateDrawer)
-        
-        
-        let drawerButton = MMDrawerBarButtonItem(target: self, action: #selector(onDrawerButtonPressed))
-        let settingsButton = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(onSettingsButtonPressed))
-        centerViewController?.navigationItem.leftBarButtonItem = drawerButton
-        centerViewController?.navigationItem.rightBarButtonItem = settingsButton
-        
+        drawerContainer?.setMaximumLeftDrawerWidth(200, animated: true, completion: nil)
+
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
         
-        dataStack.drop()
+        NotificationCenter.default.addObserver(self, selector: #selector(trySelectLibrary), name: Notifications.synchronizedNotification, object: nil)
         return true
     }
 
@@ -98,13 +94,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     @objc func onDrawerButtonPressed() {
         drawerContainer?.toggle(MMDrawerSide.left, animated: true, completion: nil)
     }
-    
-    func onSettingsButtonPressed() {
-        centerNav?.pushViewController(settingsViewController!, animated: true)
-    }
-    
+
     func animateDrawer(drawerController: MMDrawerController?, drawerSide: MMDrawerSide, percentVisible: CGFloat) {
-        centerNav?.view.alpha = 1 - (percentVisible * 0.5)
+        centerViewController?.view.alpha = 1 - (percentVisible * 0.5)
         
         //do provided animation
         let block = MMDrawerVisualState.slideVisualStateBlock()
@@ -153,8 +145,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             
             operation.completionBlock = {
-                if self.server != nil {
-                    self.synchronizeWithCurrentServer()
+                OperationQueue.main.addOperation {
+                    if let server = self.server {
+                        self.synchronize(with: server)
+                    }
                 }
             }
             
@@ -170,17 +164,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    func trySelectLibrary(_ notification: NSNotification) {
+        dataFetchQueue.addOperation {
+            if self.server != nil && self.library == nil {
+                //try to set a library
+                let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
+                let predicate = NSPredicate(format: "\(LibraryTable.serverColumnName).\(ServerTable.nameColumnName)  = %@", self.server!.name!)
+                request.predicate = predicate
+                let result = try? self.dataStack.mainContext.fetch(request)
+                self.library = result?.first as? Library
+            }
+        }
+    }
+    
     
     func synchronize(with server: Server) {
         let op = SynchronizeOperation(server)
+        op.completionBlock = {
+            NotificationCenter.default.post(name: Notifications.synchronizedNotification, object: nil)
+        }
+        
+        if self.server == nil {
+            self.server = server
+        }
         
         print("Synchronization started with server: " + server.name!)
         
         synchronizeQueue.addOperation(op)
         
-        if self.server == nil {
-            self.server = server
-        }
+
+    }
+    
+    func deleteAllData() {
+        dataStack.drop()
+        server = nil
+        library = nil
     }
     
     // MARK: - Core Data stack
@@ -247,3 +265,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 }
+

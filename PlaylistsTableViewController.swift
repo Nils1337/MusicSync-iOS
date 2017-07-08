@@ -37,6 +37,10 @@ class PlaylistsTableViewController: UITableViewController {
         return 0
     }
     
+    @IBAction func drawerButtonClicked(_ sender: Any) {
+            (self.tabBarController as! TabViewController).toggleDrawer()
+    }
+    
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
@@ -91,5 +95,8 @@ class PlaylistsTableViewController: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
-
+    
+    @IBAction func unwindToServers(segue: UIStoryboardSegue) {
+        
+    }
 }

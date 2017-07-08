@@ -8,8 +8,11 @@
 
 import UIKit
 import CoreData
+import MMDrawerController
 
 class TabViewController: UITabBarController {
+    
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +25,9 @@ class TabViewController: UITabBarController {
         // Dispose of any resources that can be recreated.
     }
     
-    
+    @objc func toggleDrawer() {
+        appDelegate.drawerContainer?.toggle(MMDrawerSide.left, animated: true, completion: nil)
+    }
     
     /*
     // MARK: - Navigation

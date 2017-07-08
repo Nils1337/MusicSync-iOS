@@ -10,6 +10,11 @@ import UIKit
 
 class SettingsTableViewController: UITableViewController {
 
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    @IBOutlet weak var deleteDataCell: UITableViewCell!
+    @IBOutlet weak var synchronizeCell: UITableViewCell!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -35,6 +40,17 @@ class SettingsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return 3
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath)
+        
+        if (cell == synchronizeCell) {
+            appDelegate.synchronizeWithCurrentServer()
+        }
+        if (cell == deleteDataCell) {
+            appDelegate.deleteAllData()
+        }
     }
 
     /*

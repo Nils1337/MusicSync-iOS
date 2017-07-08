@@ -21,6 +21,7 @@ class ServerCell: UITableViewCell {
 class ServersTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
     
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,14 +91,6 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let serverVC = segue.destination as? ServerDetailViewController {
-            if let serverCell = sender as? ServerCell {
-                serverVC.server = serverCell.server
-            }
-        }
-    }
-    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.tableView.reloadData()
     }
@@ -111,9 +104,6 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
         self.navigationController?.pushViewController(vc!, animated: true)
     }
 
-    @IBAction func unwindToServers(segue: UIStoryboardSegue) {
-        
-    }
     
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -160,14 +150,41 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if let vc = segue.destination as? ServerDetailViewController {
+            if let sender = sender as? ServerCell {
+                vc.server = sender.server
+            }
+        }
     }
-    */
+    
+    
+    @IBAction func unwindToServers(segue: UIStoryboardSegue) {
+        if let vc = segue.source as? ServerDetailViewController {
+            
+            var server = vc.server
+            var adding = false
+            if server == nil {
+                let ctx = appDelegate.dataStack.mainContext
+                server = NSEntityDescription.insertNewObject(forEntityName: "Server", into: ctx) as? Server
+                adding = true
+            }
+            
+            server!.name = vc.nameField.text
+            server!.url = vc.addressField.text
+            server!.port = Int16(vc.portField.text!)!
+            
+            appDelegate.saveContext()
+            if adding {
+                NotificationCenter.default.post(name: Notifications.serverAddedNotification, object: server)
+            }
+            appDelegate.synchronize(with: server!)
+        }
+    }
+    
 
 }

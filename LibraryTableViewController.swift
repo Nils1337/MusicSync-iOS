@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import MMDrawerController
 
 class LibraryCell: UITableViewCell, NSFetchedResultsControllerDelegate {
     
@@ -20,16 +21,19 @@ class LibraryCell: UITableViewCell, NSFetchedResultsControllerDelegate {
     }
 }
 
-class LibraryTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
+class LibraryTableViewController: UITableViewController {
 
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         loadData()
-        fetchedController?.delegate = self
         
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.serverAddedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -70,24 +74,18 @@ class LibraryTableViewController: UITableViewController, NSFetchedResultsControl
      
         let result = object as! Library
         
-        print("Adding Cell for Library: ")
-        print(" name: " + result.name! + " server: " + result.server!.name!)
-        if (result.server != nil) {
-            print(result.server!.name!)
-        }
         cell.setData(result)
         return cell
     }
  
     private func loadData() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
+
         let ctx = appDelegate.dataStack.mainContext
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
         request.resultType = .managedObjectResultType
         let s1 = NSSortDescriptor(key: LibraryTable.serverColumnName, ascending: true)
-        let s2 = NSSortDescriptor(key:LibraryTable.nameColumnName, ascending: true)
+        let s2 = NSSortDescriptor(key: LibraryTable.nameColumnName, ascending: true)
         request.sortDescriptors = [s1, s2]
         fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: #keyPath(Library.server), cacheName: nil)
         do {
@@ -96,15 +94,27 @@ class LibraryTableViewController: UITableViewController, NSFetchedResultsControl
         catch {
             fatalError("Failed to fetch entities: \(error)")
         }
+        self.tableView.reloadData()
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let sectionInfo = fetchedController?.sections?[section]
-        return sectionInfo?.name
+        let library = sectionInfo?.objects?[0] as? Library
+        return "\(library!.server!.name!) @ \(library!.server!.url!)"
     }
     
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.reloadData()
+    func reload(_ notification: NSNotification) {
+        OperationQueue.main.addOperation {
+            self.loadData()
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath) as! LibraryCell
+        let library = cell.library
+        appDelegate.server = library?.server
+        appDelegate.library = library
+        appDelegate.drawerContainer?.toggle(MMDrawerSide.left, animated: true, completion: nil)
     }
     
     /*

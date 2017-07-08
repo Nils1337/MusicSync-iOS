@@ -28,32 +28,18 @@ class ServerDetailViewController: UIViewController {
             portField.text = String(s.port)
             addressField.text = s.url
         }
-        //or create new server entity
- 
-        
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onDoneButtonPressed))
+        //some test data
+        else {
+            nameField.text = "test"
+            portField.text = "8080"
+            addressField.text = "sterny1337.ddns.net"
+        }
     }
 
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    func onDoneButtonPressed() {
-        
-        if server == nil {
-            let ctx = appDelegate.dataStack.mainContext
-            server = NSEntityDescription.insertNewObject(forEntityName: "Server", into: ctx) as? Server
-        }
-        
-        server!.name = nameField.text
-        server!.url = addressField.text
-        server!.port = Int16(portField.text!)!
-        
-        appDelegate.saveContext()
-        appDelegate.synchronize(with: server!)
-        performSegue(withIdentifier: "unwindToServers", sender: self)
     }
     
     /*@IBAction func unwindToServers(for unwindSegue: UIStoryboardSegue, towardsViewController subsequentVC: UIViewController) {

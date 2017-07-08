@@ -19,21 +19,38 @@ class SongCell: UITableViewCell {
     }
 }
 
-class SongsTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
+class SongsTableViewController: UITableViewController {
     
-    var artist: String?
-    var album: String?
+    var artist: String?  {
+        didSet(oldValue) {
+            updateTitle()
+        }
+    }
+    var album: String?  {
+        didSet(oldValue) {
+            updateTitle()
+        }
+    }
     var playlist: String?
     var songlist: [String]?
+    var library: Library? {
+        didSet(oldValue) {
+            updateTitle()
+        }
+    }
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.title = artist
+        library = appDelegate.library
+        updateTitle()
         loadData()
-        fetchedController?.delegate = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -79,7 +96,30 @@ class SongsTableViewController: UITableViewController, NSFetchedResultsControlle
         return cell
     }
     
+    private func updateTitle() {
+        var title = "No Library Selected"
+        if (library != nil) {
+            if (album == nil && artist == nil) {
+                title = "All Songs"
+            }
+            else if (album == nil && artist != nil) {
+                title = "All Songs of \(artist!)"
+            }
+            else if (album != nil && artist != nil) {
+                title = album!
+            }
+        }
+        self.navigationItem.title = title
+    }
+    
     private func loadData() {
+        
+        guard let library = library else {
+            self.fetchedController = nil
+            self.tableView.reloadData()
+            return
+        }
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         let ctx = appDelegate.dataStack.mainContext
@@ -88,13 +128,16 @@ class SongsTableViewController: UITableViewController, NSFetchedResultsControlle
         request.resultType = .managedObjectResultType
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.titleColumnName, ascending: true)]
         
-        if let art = artist {
-            if let alb = album {
-                request.predicate = NSPredicate(format: SongTable.artistColumnName + " = %@ AND " + SongTable.albumColumnName + " = %@", art, alb)
+        if let artist = artist {
+            if let album = album {
+                request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.albumColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", artist, album, library.localId!)
             }
             else {
-                request.predicate = NSPredicate(format: SongTable.artistColumnName + " = %@", art)
+                request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", artist, library.localId!)
             }
+        }
+        else {
+            request.predicate = NSPredicate(format: "\(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", library.localId!)
         }
 
         fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
@@ -104,10 +147,20 @@ class SongsTableViewController: UITableViewController, NSFetchedResultsControlle
         catch {
             fatalError("Failed to fetch entities: \(error)")
         }
+        self.tableView.reloadData()
     }
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.reloadData()
+    func reload(_ notification: NSNotification) {
+        if notification.name == Notifications.libraryChangedNotification {
+            library = appDelegate.library
+        }
+        OperationQueue.main.addOperation {
+            self.loadData()
+        }
+    }
+    
+    @IBAction func drawerButtonClicked(_ sender: Any) {
+        (self.tabBarController as! TabViewController).toggleDrawer()
     }
     
     /*
@@ -155,4 +208,8 @@ class SongsTableViewController: UITableViewController, NSFetchedResultsControlle
     }
     */
 
+    @IBAction func unwindToServers(segue: UIStoryboardSegue) {
+        
+    }
+    
 }

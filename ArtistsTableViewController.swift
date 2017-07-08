@@ -19,16 +19,21 @@ class ArtistCell: UITableViewCell {
     }
 }
 
-class ArtistsTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
+class ArtistsTableViewController: UITableViewController {
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var artists = [NSDictionary]()
+    var library: Library?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        library = appDelegate.library
+        navigationItem.title = "All Artists"
         loadData()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(synchronizationFinished), name: NSNotification.Name("SongsSynchronized"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -62,6 +67,13 @@ class ArtistsTableViewController: UITableViewController, NSFetchedResultsControl
     }
     
     private func loadData() {
+        
+        guard let library = library else {
+            artists.removeAll()
+            self.tableView.reloadData()
+            return
+        }
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
         let ctx = appDelegate.dataStack.mainContext
@@ -71,7 +83,13 @@ class ArtistsTableViewController: UITableViewController, NSFetchedResultsControl
         request.propertiesToFetch = [SongTable.artistColumnName]
         request.returnsDistinctResults = true
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.artistColumnName, ascending: true)]
-        artists = try! ctx.fetch(request) as! [NSDictionary]
+        request.predicate = NSPredicate(format: "\(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", library.localId!)
+        do {
+            artists = try ctx.fetch(request) as! [NSDictionary]
+        }
+        catch {
+            fatalError("Failed to fetch entities: \(error)")
+        }
         self.tableView.reloadData()
     }
     
@@ -83,12 +101,18 @@ class ArtistsTableViewController: UITableViewController, NSFetchedResultsControl
         }
     }
     
-    func synchronizationFinished() {
+    func reload(_ notification: NSNotification) {
+        if notification.name == Notifications.libraryChangedNotification {
+            library = appDelegate.library
+        }
         OperationQueue.main.addOperation {
             self.loadData()
         }
     }
-
+    
+    @IBAction func drawerButtonClicked(_ sender: Any) {
+        (self.tabBarController as! TabViewController).toggleDrawer()
+    }
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -133,5 +157,9 @@ class ArtistsTableViewController: UITableViewController, NSFetchedResultsControl
         // Pass the selected object to the new view controller.
     }
     */
+    
+    @IBAction func unwindToServers(segue: UIStoryboardSegue) {
+
+    }
 
 }
