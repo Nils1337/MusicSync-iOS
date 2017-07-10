@@ -14,8 +14,9 @@ struct SongTable {
     static let titleColumnName = "title"
     static let libraryColumnName = "library"
     static let serverColumnName = "server"
-    static let localIdColumnName = "localId"
-    static let remoteIdColumnName = "remoteId"
+    static let idColumnName = "id"
+    static let downloadedColumnName = "downloaded"
+    static let filenameColumnName = "filename"
 }
 
 struct ServerTable {
@@ -25,8 +26,7 @@ struct ServerTable {
 struct LibraryTable {
     static let nameColumnName = "name"
     static let serverColumnName = "server"
-    static let localIdColumnName = "localId"
-    static let remoteIdColumnName = "remoteId"
+    static let idColumnName = "id"
 }
 
 struct Notifications {

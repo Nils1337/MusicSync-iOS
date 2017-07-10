@@ -130,14 +130,14 @@ class SongsTableViewController: UITableViewController {
         
         if let artist = artist {
             if let album = album {
-                request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.albumColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", artist, album, library.localId!)
+                request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.albumColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", artist, album, library.id!)
             }
             else {
-                request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", artist, library.localId!)
+                request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", artist, library.id!)
             }
         }
         else {
-            request.predicate = NSPredicate(format: "\(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", library.localId!)
+            request.predicate = NSPredicate(format: "\(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", library.id!)
         }
 
         fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)

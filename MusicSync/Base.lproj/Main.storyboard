@@ -25,11 +25,11 @@
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KZR-Er-Yt0" id="icT-gb-V5O">
-                                            <rect key="frame" x="0.0" y="0.0" width="342" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="342" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Manage Servers" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="PXd-rm-dU3">
-                                                    <rect key="frame" x="15" y="0.0" width="325" height="43"/>
+                                                    <rect key="frame" x="15" y="0.0" width="325" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
@@ -296,9 +296,9 @@
                     </tabBar>
                     <connections>
                         <segue destination="Vk4-Vk-Vfn" kind="relationship" relationship="viewControllers" id="w7Z-PX-f35"/>
-                        <segue destination="tAz-UC-wI8" kind="relationship" relationship="viewControllers" id="eFL-cB-WNs"/>
                         <segue destination="LuO-rY-j2S" kind="relationship" relationship="viewControllers" id="NmN-E7-ty3"/>
                         <segue destination="wxm-eX-bbr" kind="relationship" relationship="viewControllers" id="ZeS-yN-wXR"/>
+                        <segue destination="tAz-UC-wI8" kind="relationship" relationship="viewControllers" id="eFL-cB-WNs"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>

@@ -50,12 +50,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         drawerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.bezelPanningCenterView
         drawerContainer?.closeDrawerGestureModeMask = [MMCloseDrawerGestureMode.panningCenterView, MMCloseDrawerGestureMode.panningDrawerView, MMCloseDrawerGestureMode.tapCenterView]
         drawerContainer?.showsShadow = false
-        //drawerContainer?.setDrawerVisualStateBlock(MMDrawerVisualState.slideVisualStateBlock())
         drawerContainer?.setDrawerVisualStateBlock(animateDrawer)
         drawerContainer?.setMaximumLeftDrawerWidth(200, animated: true, completion: nil)
 
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
+        
+        deleteAllData()
         
         NotificationCenter.default.addObserver(self, selector: #selector(trySelectLibrary), name: Notifications.synchronizedNotification, object: nil)
         return true

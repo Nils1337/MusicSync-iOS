@@ -83,7 +83,7 @@ class ArtistsTableViewController: UITableViewController {
         request.propertiesToFetch = [SongTable.artistColumnName]
         request.returnsDistinctResults = true
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.artistColumnName, ascending: true)]
-        request.predicate = NSPredicate(format: "\(SongTable.libraryColumnName).\(LibraryTable.localIdColumnName) = %@", library.localId!)
+        request.predicate = NSPredicate(format: "\(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", library.id!)
         do {
             artists = try ctx.fetch(request) as! [NSDictionary]
         }

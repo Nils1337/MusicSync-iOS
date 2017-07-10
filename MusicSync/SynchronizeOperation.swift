@@ -87,6 +87,8 @@ class SynchronizeOperation: Operation {
         
         
         //just delete all old data (maybe a bit slow but easier)
+        
+        /*
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
         let predicate = NSPredicate(format: "\(LibraryTable.serverColumnName).\(ServerTable.nameColumnName) = %@", server!.name!)
         fetchRequest.predicate = predicate
@@ -95,9 +97,9 @@ class SynchronizeOperation: Operation {
             try appDelegate.dataStack.mainContext.execute(deleteRequest)
         } catch {
             print("Error trying to delete libraries!")
-        }
+        }*/
         
-        librarySync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Library", predicate: nil, dataStack: appDelegate.dataStack, operations: .insert)
+        librarySync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Library", predicate: nil, dataStack: appDelegate.dataStack, operations: .all)
         
         //need to keep reference to delegate here because for some reason its a weak reference in Sync class...
         let delegate = LibraryDelegate(self)
@@ -152,6 +154,8 @@ class SynchronizeOperation: Operation {
         }
         
         //just delete all old data (maybe a bit slow but easier)
+        
+        /*
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
         let predicate = NSPredicate(format: "\(SongTable.serverColumnName).\(ServerTable.nameColumnName) = %@", server!.name!)
         fetchRequest.predicate = predicate
@@ -160,10 +164,10 @@ class SynchronizeOperation: Operation {
             try appDelegate.dataStack.mainContext.execute(deleteRequest)
         } catch {
             print("Error trying to delete songs!")
-        }
+        }*/
         
         
-        songSync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Song", predicate: nil, dataStack: appDelegate.dataStack, operations: .insert)
+        songSync = Sync(changes: json as! [[String : Any]], inEntityNamed: "Song", predicate: nil, dataStack: appDelegate.dataStack, operations: .all)
         
         //need to keep reference to delegate here because for some reason its a weak reference in Sync class...
         let delegate = SongDelegate(self)
@@ -185,7 +189,7 @@ class LibraryDelegate: SyncDelegate {
         self.syncOp = syncOp
     }
     
-    func sync(_ sync: Sync, willInsert json: [String : Any], in entityNamed: String, parent: NSManagedObject?) -> [String : Any] {
+    func insert(_ sync: Sync, willInsert json: [String : Any], in entityNamed: String, parent: NSManagedObject?) -> [String : Any] {
         
         //copy dictionary because passed one is immutable
         var update = json
@@ -194,12 +198,27 @@ class LibraryDelegate: SyncDelegate {
         update.updateValue(syncOp.server!.name!, forKey: LibraryTable.serverColumnName + "_id")
         
         //set local id (concatenate remoteId with server id)
-        //set local id (concatenate remoteId with server id)
+        /*
         let remoteId = update["id"] as! Int64
         let localId = String(remoteId) + syncOp.server!.name!
         update.updateValue(localId, forKey: "id")
-        update.updateValue(remoteId, forKey: LibraryTable.remoteIdColumnName)
+        update.updateValue(remoteId, forKey: LibraryTable.remoteIdColumnName)*/
         return update
+    }
+    
+    func update(json: [String: Any], updateObject: NSManagedObject) -> [String: Any] {
+        
+        guard let library = updateObject as? Library else {
+            return json
+        }
+        
+        var update = json;
+        
+        if let server = library.server {
+            update.updateValue(server.name!, forKey: LibraryTable.serverColumnName + "_id")
+        }
+        
+        return update;
     }
 }
 
@@ -210,7 +229,7 @@ class SongDelegate: SyncDelegate {
         self.syncOp = syncOp
     }
     
-    func sync(_ sync: Sync, willInsert json: [String : Any], in entityNamed: String, parent: NSManagedObject?) -> [String : Any] {
+    func insert(_ sync: Sync, willInsert json: [String : Any], in entityNamed: String, parent: NSManagedObject?) -> [String : Any] {
         
         //copy dictionary because passed one is immutable
         var update = json
@@ -218,11 +237,13 @@ class SongDelegate: SyncDelegate {
         //add server id to library entity
         update.updateValue(syncOp.server!.name!, forKey: SongTable.serverColumnName + "_id")
         
+        /*
         //set local id (concatenate remoteId with server id)
         let remoteId = update["id"] as! Int64
         let localId = String(remoteId) + syncOp.server!.name!
         update.updateValue(localId, forKey: "id")
         update.updateValue(remoteId, forKey: SongTable.remoteIdColumnName)
+ 
         
         //get correct library with localId
         let libraryRemoteId = update[SongTable.libraryColumnName] as! Int64
@@ -238,7 +259,42 @@ class SongDelegate: SyncDelegate {
         //fix library key for correct relationship
         update.removeValue(forKey: SongTable.libraryColumnName)
         update.updateValue(library.localId!, forKey: SongTable.libraryColumnName + "_id")
+        */
+        
+        update.updateValue(0, forKey: SongTable.downloadedColumnName)
+        if let library = update[SongTable.libraryColumnName] {
+            update.updateValue(library, forKey: SongTable.libraryColumnName + "_id")
+        }
+        update.removeValue(forKey: SongTable.libraryColumnName)
+        
+        //update.updateValue(nil, forKey: SongTable.filenameColumnName)
         
         return update
+    }
+    
+    func update(json: [String: Any], updateObject: NSManagedObject) -> [String: Any] {
+        guard let song = updateObject as? Song else {
+            return json
+        }
+        
+        var update = json;
+        
+        if let server = song.server {
+            update.updateValue(server.name!, forKey: SongTable.serverColumnName + "_id")
+        }
+        
+        update.updateValue(0, forKey: SongTable.downloadedColumnName)
+        if let library = update[SongTable.libraryColumnName] {
+            update.updateValue(library, forKey: SongTable.libraryColumnName + "_id")
+        }
+        update.removeValue(forKey: SongTable.libraryColumnName)
+        
+        update.updateValue(song.downloaded, forKey: SongTable.downloadedColumnName)
+
+        if let filename = update[SongTable.filenameColumnName] {
+            update.updateValue(filename, forKey: SongTable.filenameColumnName)
+        }
+        
+        return update;
     }
 }

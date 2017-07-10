@@ -100,7 +100,10 @@ class LibraryTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let sectionInfo = fetchedController?.sections?[section]
         let library = sectionInfo?.objects?[0] as? Library
-        return "\(library!.server!.name!) @ \(library!.server!.url!)"
+        guard let server = library?.server else {
+            return "error"
+        }
+        return "\(server.name!) @ \(server.url!)"
     }
     
     func reload(_ notification: NSNotification) {

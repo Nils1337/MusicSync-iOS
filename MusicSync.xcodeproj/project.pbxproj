@@ -305,6 +305,7 @@
 				TargetAttributes = {
 					296835331EC487E7004BCA50 = {
 						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = 8QFLX5HN9Q;
 						ProvisioningStyle = Automatic;
 					};
 					296835491EC487E7004BCA50 = {
@@ -677,11 +678,14 @@
 			baseConfigurationReference = BCA9937EB65512E4D4EFF4CB /* Pods-MusicSync.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 8QFLX5HN9Q;
 				INFOPLIST_FILE = MusicSync/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = hhu.MusicSync;
+				PRODUCT_BUNDLE_IDENTIFIER = HHU.MusicSync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -692,11 +696,14 @@
 			baseConfigurationReference = 7C93FFADEECF283D5B7BC454 /* Pods-MusicSync.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 8QFLX5HN9Q;
 				INFOPLIST_FILE = MusicSync/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = hhu.MusicSync;
+				PRODUCT_BUNDLE_IDENTIFIER = HHU.MusicSync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
