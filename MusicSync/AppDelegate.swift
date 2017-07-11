@@ -56,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
         
-        deleteAllData()
+        //deleteAllData()
         
         NotificationCenter.default.addObserver(self, selector: #selector(trySelectLibrary), name: Notifications.synchronizedNotification, object: nil)
         return true

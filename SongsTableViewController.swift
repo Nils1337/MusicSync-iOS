@@ -19,6 +19,14 @@ class SongCell: UITableViewCell {
     }
 }
 
+class LocalSongCell: SongCell {
+    
+}
+
+class RemoteSongCell: SongCell {
+    
+}
+
 class SongsTableViewController: UITableViewController {
     
     var artist: String?  {
@@ -83,15 +91,26 @@ class SongsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "songCell", for: indexPath) as! SongCell
         
         guard let object = self.fetchedController?.object(at: indexPath) else {
             fatalError("Attempt to configure cell without managed object")
         }
         
-        let result = object as! Song
+        guard let song = object as? Song else {
+            fatalError("Object fetched from database is not a song!")
+        }
         
-        cell.setData(result)
+        var cell: SongCell
+        
+        if (song.downloaded == 0) {
+            cell = tableView.dequeueReusableCell(withIdentifier: "remoteSongCell", for: indexPath) as! SongCell
+        
+        }
+        else {
+            cell = tableView.dequeueReusableCell(withIdentifier: "localSongCell", for: indexPath) as! SongCell
+        }
+        
+        cell.setData(song)
         
         return cell
     }
@@ -161,6 +180,18 @@ class SongsTableViewController: UITableViewController {
     
     @IBAction func drawerButtonClicked(_ sender: Any) {
         (self.tabBarController as! TabViewController).toggleDrawer()
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath) as! SongCell
+        if cell is RemoteSongCell {
+            cell.song!.downloaded = 1
+            appDelegate.saveContext()
+            loadData()
+        }
+        else {
+            tabBarController?.selectedIndex = 3
+        }
     }
     
     /*
