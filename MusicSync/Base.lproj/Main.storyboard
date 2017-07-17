@@ -637,7 +637,7 @@
         <scene sceneID="I7t-YK-zy5">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Vk4-Vk-Vfn" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" tag="1" title="Artists" id="VqM-5R-NIH"/>
+                    <tabBarItem key="tabBarItem" tag="1" title="Artists" image="artists" selectedImage="artists" id="VqM-5R-NIH"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="JBo-KI-mn8">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -656,7 +656,7 @@
         <scene sceneID="Qfa-vV-zPl">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="LuO-rY-j2S" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Songs" image="second" id="7fF-hx-8TF"/>
+                    <tabBarItem key="tabBarItem" title="Songs" image="songs" selectedImage="songs" id="7fF-hx-8TF"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="cJm-Pn-uwB">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -675,7 +675,7 @@
         <scene sceneID="ekI-AF-WRb">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="wxm-eX-bbr" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Playlists" id="6Zo-V9-uSj"/>
+                    <tabBarItem key="tabBarItem" title="Playlists" image="playlists" selectedImage="playlists" id="6Zo-V9-uSj"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="4ev-a1-UE4">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -694,7 +694,7 @@
         <scene sceneID="PEw-5U-VYq">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="tAz-UC-wI8" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Playing" id="wdL-LJ-abg"/>
+                    <tabBarItem key="tabBarItem" title="Playing" image="playing" selectedImage="playing" id="wdL-LJ-abg"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="fUd-bI-HOE">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -711,11 +711,14 @@
         </scene>
     </scenes>
     <resources>
-        <image name="download" width="256" height="256"/>
-        <image name="second" width="30" height="30"/>
+        <image name="artists" width="25" height="25"/>
+        <image name="download" width="25" height="25"/>
+        <image name="playing" width="25" height="25"/>
+        <image name="playlists" width="25" height="25"/>
+        <image name="songs" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="wd8-hI-26v"/>
+        <segue reference="etv-IB-485"/>
         <segue reference="aNc-Zv-PyS"/>
     </inferredMetricsTieBreakers>
 </document>
