@@ -12,6 +12,7 @@ import CoreData
 class SongCell: UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     var song: Song?
+    weak var download: URLSessionDownloadTask?
     
     func setData(_ song: Song) {
         self.song = song
@@ -23,11 +24,16 @@ class LocalSongCell: SongCell {
     
 }
 
+class DownloadingSongCell: SongCell {
+    @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
+
+}
+
 class RemoteSongCell: SongCell {
     
 }
 
-class SongsTableViewController: UITableViewController {
+class SongsTableViewController: UITableViewController, DownloadDelegate {
     
     var artist: String?  {
         didSet(oldValue) {
@@ -49,7 +55,6 @@ class SongsTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -102,12 +107,18 @@ class SongsTableViewController: UITableViewController {
         
         var cell: SongCell
         
-        if (song.downloaded == 0) {
-            cell = tableView.dequeueReusableCell(withIdentifier: "remoteSongCell", for: indexPath) as! SongCell
-        
-        }
-        else {
-            cell = tableView.dequeueReusableCell(withIdentifier: "localSongCell", for: indexPath) as! SongCell
+        switch (song.downloadStatus) {
+            case .Remote:
+                cell = tableView.dequeueReusableCell(withIdentifier: "remoteSongCell", for: indexPath) as! SongCell
+                break
+            case .Downloading:
+                cell = tableView.dequeueReusableCell(withIdentifier: "downloadingSongCell", for: indexPath) as! SongCell
+                let downloadCell = cell as! DownloadingSongCell
+                downloadCell.loadingIndicator.startAnimating()
+                break
+            case .Local:
+                cell = tableView.dequeueReusableCell(withIdentifier: "localSongCell", for: indexPath) as! SongCell
+                break
         }
         
         cell.setData(song)
@@ -185,13 +196,37 @@ class SongsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath) as! SongCell
         if cell is RemoteSongCell {
-            cell.song!.downloaded = 1
+            
+            guard let song = cell.song else {
+                print("cell has no song!")
+                return
+            }
+            
+            song.downloadStatus = .Downloading
             appDelegate.saveContext()
-            loadData()
+            
+            guard let server = appDelegate.server else {
+                print("no server for downloading available!")
+                return
+            }
+            DownloadManager.shared.delegate = self
+            DownloadManager.shared.addDownload(server: server, song: song)
+            self.tableView.reloadRows(at: [indexPath], with: .automatic)
         }
         else {
             tabBarController?.selectedIndex = 3
         }
+    }
+    
+    func downloadFinished(_ download: Download) {
+        download.song.downloadStatus = .Local
+        appDelegate.saveContext()
+        OperationQueue.main.addOperation {
+            self.loadData()
+        }
+    }
+    
+    func update() {
     }
     
     /*

@@ -92,6 +92,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        //gets called when application is started by background session that is finished downloading
+        completionHandler()
+    }
+    
     @objc func onDrawerButtonPressed() {
         drawerContainer?.toggle(MMDrawerSide.left, animated: true, completion: nil)
     }

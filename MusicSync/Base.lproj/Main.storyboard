@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -468,19 +469,19 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="download" translatesAutoresizingMaskIntoConstraints="NO" id="dhW-xG-aru">
+                                            <rect key="frame" x="332" y="9.5" width="25" height="25"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="25" id="QJ3-wk-NCP"/>
+                                                <constraint firstAttribute="width" secondItem="dhW-xG-aru" secondAttribute="height" multiplier="1:1" id="yjs-dB-vgj"/>
+                                            </constraints>
+                                        </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Song Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LFc-gG-F6I">
-                                            <rect key="frame" x="18" y="8" width="299" height="28"/>
+                                            <rect key="frame" x="18" y="8" width="304" height="28"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="download" translatesAutoresizingMaskIntoConstraints="NO" id="dhW-xG-aru">
-                                            <rect key="frame" x="327" y="7" width="30" height="30"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="30" id="bfV-ai-rf3"/>
-                                                <constraint firstAttribute="height" constant="30" id="hro-jg-RSS"/>
-                                            </constraints>
-                                        </imageView>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="LFc-gG-F6I" firstAttribute="centerY" secondItem="gEL-p1-Lhd" secondAttribute="centerY" id="F4H-Mn-edk"/>
@@ -495,6 +496,36 @@
                                     <outlet property="titleLabel" destination="LFc-gG-F6I" id="D5W-FH-2pQ"/>
                                 </connections>
                             </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="downloadingSongCell" id="0ju-eA-kCi" customClass="DownloadingSongCell" customModule="MusicSync" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="116" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0ju-eA-kCi" id="dfd-ky-07N">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="hIl-jq-w0R">
+                                            <rect key="frame" x="336" y="13" width="20" height="20"/>
+                                        </activityIndicatorView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Song Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LfA-yJ-ayV">
+                                            <rect key="frame" x="16" y="12" width="305" height="20.5"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="hIl-jq-w0R" firstAttribute="leading" secondItem="LfA-yJ-ayV" secondAttribute="trailing" constant="15" id="Lre-Br-HAq"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="hIl-jq-w0R" secondAttribute="trailing" constant="11" id="Swr-EF-Ylq"/>
+                                        <constraint firstItem="LfA-yJ-ayV" firstAttribute="leading" secondItem="dfd-ky-07N" secondAttribute="leadingMargin" constant="8" id="gjN-Uv-cPZ"/>
+                                        <constraint firstItem="hIl-jq-w0R" firstAttribute="top" secondItem="dfd-ky-07N" secondAttribute="topMargin" constant="5" id="ium-lr-2VI"/>
+                                        <constraint firstItem="LfA-yJ-ayV" firstAttribute="centerY" secondItem="dfd-ky-07N" secondAttribute="centerY" id="wyq-bS-Btk"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="loadingIndicator" destination="hIl-jq-w0R" id="NdS-wq-XNC"/>
+                                    <outlet property="titleLabel" destination="LfA-yJ-ayV" id="Efy-Cf-rhO"/>
+                                </connections>
+                            </tableViewCell>
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="2Ul-WB-eg7" id="4Yh-qF-BYv"/>
@@ -505,7 +536,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mGO-EQ-s81" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3791" y="-744"/>
+            <point key="canvasLocation" x="3789.5999999999999" y="-744.3778110944528"/>
         </scene>
         <!--Songs Table View Controller-->
         <scene sceneID="xUe-lS-UHb">
@@ -570,6 +601,36 @@
                                     <outlet property="titleLabel" destination="uJT-qy-tP4" id="yAI-Ys-mVt"/>
                                 </connections>
                             </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="downloadingSongCell" id="hPD-uA-lzw" customClass="DownloadingSongCell" customModule="MusicSync" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="116" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hPD-uA-lzw" id="wgk-m7-I6o">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="juL-Ci-vBP">
+                                            <rect key="frame" x="336" y="13" width="20" height="20"/>
+                                        </activityIndicatorView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Song Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="osA-fL-1PK">
+                                            <rect key="frame" x="16" y="12" width="305" height="20.5"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="osA-fL-1PK" firstAttribute="leading" secondItem="wgk-m7-I6o" secondAttribute="leadingMargin" constant="8" id="Fde-uK-dVQ"/>
+                                        <constraint firstItem="osA-fL-1PK" firstAttribute="centerY" secondItem="wgk-m7-I6o" secondAttribute="centerY" id="Jwr-Z0-rhJ"/>
+                                        <constraint firstItem="juL-Ci-vBP" firstAttribute="top" secondItem="wgk-m7-I6o" secondAttribute="topMargin" constant="5" id="ScN-aK-y6b"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="juL-Ci-vBP" secondAttribute="trailing" constant="11" id="a9E-hh-ySX"/>
+                                        <constraint firstItem="juL-Ci-vBP" firstAttribute="leading" secondItem="osA-fL-1PK" secondAttribute="trailing" constant="15" id="flh-lh-LbD"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="loadingIndicator" destination="juL-Ci-vBP" id="kzV-fV-SVF"/>
+                                    <outlet property="titleLabel" destination="osA-fL-1PK" id="YKu-iI-1B9"/>
+                                </connections>
+                            </tableViewCell>
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="W6t-2O-eJC" id="R5Q-oI-Y1c"/>
@@ -602,7 +663,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="LDl-0f-qJL">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="playlistCell" id="LDl-0f-qJL">
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="LDl-0f-qJL" id="oTG-bR-Eks">
