@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import ReachabilitySwift
+import UIKit
 
 protocol DownloadDelegate {
     func downloadFinished(_ song: Download)
@@ -21,6 +23,7 @@ struct Download {
 class DownloadManager: NSObject, URLSessionDownloadDelegate {
     
     static let shared = DownloadManager()
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     lazy var session: URLSession = {
         let config = URLSessionConfiguration.background(withIdentifier: Bundle.main.bundleIdentifier!)
@@ -31,15 +34,31 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
     var downloads = [Download]()
     var delegate: DownloadDelegate?
     
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged), name: ReachabilityChangedNotification, object: appDelegate.reachability)
+        do {
+            try appDelegate.reachability.startNotifier()
+        }
+        catch {
+            print("could not start reachability notifier!")
+        }
+    }
     
     func addDownload(server: Server, song: Song) {
         let url = URL(string: "http://" + server.url! + ":" + String(server.port) + DownloadManager.downloadUrl + "/" + song.id!)
         let request = URLRequest(url: url!)
         let download = session.downloadTask(with: request)
         downloads.append(Download(song: song, task: download))
+        
+        song.downloadStatus = .Downloading
+        appDelegate.saveContext()
+        
         if downloads.count == 1 {
             print("starting download of song \(song.title!)")
-            download.resume()
+            if (appDelegate.isWifiConnected()) {
+                download.resume()
+            }
         }
     }
     
@@ -62,6 +81,35 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
             print("starting download of song \(download.song.title!)")
             download.task.resume()
         }
-        delegate?.downloadFinished(download)
+        
+        let fileManager = FileManager.default
+        let libraryPath = NSHomeDirectory() + "/" + download.song.library!.id!
+        let filePath = libraryPath + "/" + download.song.id!
+        do {
+            if !fileManager.fileExists(atPath: libraryPath) {
+                try fileManager.createDirectory(atPath: libraryPath, withIntermediateDirectories: false, attributes: nil)
+            }
+            try fileManager.copyItem(at: location, to: URL(fileURLWithPath: filePath))
+            
+            download.song.downloadStatus = .Local
+            download.song.filename = filePath
+            
+            
+            delegate?.downloadFinished(download)
+        }
+        
+        catch {
+            print("error trying to create copy file!")
+        }
+    }
+    
+    func reachabilityChanged(notification: Notification) {
+        let reachability = notification.object as! Reachability
+        
+        if reachability.isReachableViaWiFi {
+            if downloads.count > 0 {
+                downloads[0].task.resume()
+            }
+        }
     }
 }

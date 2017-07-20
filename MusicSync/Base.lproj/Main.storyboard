@@ -458,6 +458,7 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
+                                <gestureRecognizers/>
                                 <connections>
                                     <outlet property="titleLabel" destination="1li-EX-dsr" id="G2L-oR-rsg"/>
                                 </connections>

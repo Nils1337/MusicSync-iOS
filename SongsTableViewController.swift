@@ -21,7 +21,7 @@ class SongCell: UITableViewCell {
 }
 
 class LocalSongCell: SongCell {
-    
+    let gesture = UILongPressGestureRecognizer()
 }
 
 class DownloadingSongCell: SongCell {
@@ -58,6 +58,8 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        DownloadManager.shared.delegate = self
+
         library = appDelegate.library
         updateTitle()
         loadData()
@@ -110,6 +112,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
         switch (song.downloadStatus) {
             case .Remote:
                 cell = tableView.dequeueReusableCell(withIdentifier: "remoteSongCell", for: indexPath) as! SongCell
+                cell.setEditing(false, animated: true)
                 break
             case .Downloading:
                 cell = tableView.dequeueReusableCell(withIdentifier: "downloadingSongCell", for: indexPath) as! SongCell
@@ -117,7 +120,11 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
                 downloadCell.loadingIndicator.startAnimating()
                 break
             case .Local:
-                cell = tableView.dequeueReusableCell(withIdentifier: "localSongCell", for: indexPath) as! SongCell
+                let localCell = tableView.dequeueReusableCell(withIdentifier: "localSongCell", for: indexPath) as! LocalSongCell
+                /*localCell.gesture.addTarget(self, action: #selector(localCellPressedLong))
+                localCell.gestureRecognizers = []
+                localCell.gestureRecognizers!.append(localCell.gesture)*/
+                cell = localCell
                 break
         }
         
@@ -202,24 +209,36 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
                 return
             }
             
-            song.downloadStatus = .Downloading
-            appDelegate.saveContext()
-            
             guard let server = appDelegate.server else {
                 print("no server for downloading available!")
                 return
             }
-            DownloadManager.shared.delegate = self
-            DownloadManager.shared.addDownload(server: server, song: song)
-            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            
+            if !appDelegate.isWifiConnected() {
+                let alert = UIAlertController(title: "Connection Error", message: "You are not connected to Wifi!", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
+                    alertAction in
+                    DownloadManager.shared.addDownload(server: server, song: song)
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                }))
+                self.present(alert, animated: true, completion: nil)
+            }
+            else {
+                DownloadManager.shared.addDownload(server: server, song: song)
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+            
         }
-        else {
+        else if cell is LocalSongCell {
             tabBarController?.selectedIndex = 3
         }
     }
     
+    func localCellPressedLong(_ sender: UILongPressGestureRecognizer) {
+        self.tableView.setEditing(!true, animated: true)
+    }
+    
     func downloadFinished(_ download: Download) {
-        download.song.downloadStatus = .Local
         appDelegate.saveContext()
         OperationQueue.main.addOperation {
             self.loadData()
@@ -229,25 +248,39 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
     func update() {
     }
     
-    /*
+    
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
-        return true
+        let cell = tableView.cellForRow(at: indexPath)
+        return cell is LocalSongCell
     }
-    */
+    
 
-    /*
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            let cell = tableView.cellForRow(at: indexPath) as! LocalSongCell
+            
+            //TODO delete file
+            cell.song!.downloadStatus = .Remote
+            
+            let fileManager = FileManager.default
+            do {
+                try fileManager.removeItem(atPath: cell.song!.filename!)
+            }
+            catch {
+                print(error.localizedDescription)
+            }
+            
+            appDelegate.saveContext()
+            
+            tableView.reloadRows(at: [indexPath], with: .automatic)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    */
+    
 
     /*
     // Override to support rearranging the table view.

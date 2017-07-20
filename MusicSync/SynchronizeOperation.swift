@@ -229,7 +229,7 @@ class SongDelegate: SyncDelegate {
         }
         update.removeValue(forKey: SongTable.libraryColumnName)
         
-        update.updateValue(song.downloadStatus, forKey: "download_status")
+        update.updateValue(song.downloadStatus.rawValue, forKey: "download_status")
 
         if let filename = update[SongTable.filenameColumnName] {
             update.updateValue(filename, forKey: SongTable.filenameColumnName)

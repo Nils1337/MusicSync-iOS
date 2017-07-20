@@ -10,12 +10,14 @@ import UIKit
 import MMDrawerController
 import CoreData
 import Sync
+import ReachabilitySwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     let synchronizeQueue = OperationQueue()
     let dataFetchQueue = OperationQueue()
+    let reachability = Reachability()!
 
     let dataStack = DataStack(modelName: "DataModel")
     
@@ -56,6 +58,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
         
+        /*let defaults = UserDefaults.standard
+         let serverName = defaults.object(forKey: serverKey)
+         let libraryId = defaults.object(forKey: libraryKey)*/
         //deleteAllData()
         
         NotificationCenter.default.addObserver(self, selector: #selector(trySelectLibrary), name: Notifications.synchronizedNotification, object: nil)
@@ -71,8 +76,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         let defaults = UserDefaults.standard
-        defaults.set(server, forKey: serverKey)
-        defaults.set(library, forKey: libraryKey)
+        defaults.set(server?.name!, forKey: serverKey)
+        defaults.set(library?.id!, forKey: libraryKey)
    }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -81,9 +86,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        let defaults = UserDefaults.standard
-        server = defaults.object(forKey: serverKey) as? Server
-        library = defaults.object(forKey: libraryKey) as? Library
         
         synchronizeWithCurrentServer()
     }
@@ -205,6 +207,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dataStack.drop()
         server = nil
         library = nil
+    }
+    
+    func isWifiConnected() -> Bool {
+        return reachability.isReachableViaWiFi
+    }
+    
+    func loadSavedData() {
+        let defaults = UserDefaults.standard
+        let serverName = defaults.object(forKey: serverKey) as? String
+        let libraryId = defaults.object(forKey: libraryKey) as? String
+        
+        if serverName != nil {
+            let request: NSFetchRequest<Server> = Server.fetchRequest()
+            request.predicate = NSPredicate(format: "\(ServerTable.nameColumnName) = %@", serverName!)
+            dataStack.performInNewBackgroundContext {
+                context in
+                
+                do {
+                    let servers = try context.fetch(request)
+                    if servers.count > 0 {
+                        self.server = servers[0]
+                    }
+                } catch {
+                    print("error fetching saved server!")
+                }
+            }
+        }
+        
+        if libraryId != nil {
+            let request: NSFetchRequest<Library> = Library.fetchRequest()
+            request.predicate = NSPredicate(format: "\(ServerTable.nameColumnName) = %@", serverName!)
+            dataStack.performInNewBackgroundContext {
+                context in
+                
+                do {
+                    let libraries = try context.fetch(request)
+                    if libraries.count > 0 {
+                        self.library = libraries[0]
+                    }
+                } catch {
+                    print("error fetching saved server!")
+                }
+            }
+        }
+        
     }
     
     // MARK: - Core Data stack
