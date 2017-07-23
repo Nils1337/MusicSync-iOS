@@ -216,11 +216,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
             
             if !appDelegate.isWifiConnected() {
                 let alert = UIAlertController(title: "Connection Error", message: "You are not connected to Wifi!", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
-                    alertAction in
-                    DownloadManager.shared.addDownload(server: server, song: song)
-                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                }))
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
             }
             else {
@@ -239,13 +235,21 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
     }
     
     func downloadFinished(_ download: Download) {
-        appDelegate.saveContext()
         OperationQueue.main.addOperation {
             self.loadData()
         }
     }
     
     func update() {
+    }
+    
+    func error(_ error: Error) {
+        OperationQueue.main.addOperation {
+            let alert = UIAlertController(title: "Download Error", message: "There was an error during download: \(error.localizedDescription)", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+            self.loadData()
+        }
     }
     
     

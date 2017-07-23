@@ -204,7 +204,7 @@ class SongDelegate: SyncDelegate {
         //add server id to library entity
         update.updateValue(syncOp.server!.name!, forKey: SongTable.serverColumnName + "_id")
         
-        update.updateValue(0, forKey: SongTable.downloadStatusColumnName)
+        update.updateValue(Song.DownloadStatus.Remote.rawValue, forKey: SongTable.downloadStatusColumnName)
         if let library = update[SongTable.libraryColumnName] {
             update.updateValue(library, forKey: SongTable.libraryColumnName + "_id")
         }

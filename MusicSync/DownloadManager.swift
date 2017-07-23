@@ -13,6 +13,7 @@ import UIKit
 protocol DownloadDelegate {
     func downloadFinished(_ song: Download)
     func update()
+    func error(_ error: Error)
 }
 
 struct Download {
@@ -62,6 +63,12 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         }
     }
     
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if error != nil {
+            delegate?.error(error!)
+        }
+    }
+    
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64) {
         
     }
@@ -69,9 +76,10 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
         guard downloads.count > 0 else {
-            print("download finished method invoked but no download in queue!")
+            delegate?.error(RuntimeError.Message("A Download was finished but no task entity is present!"))
             return
         }
+        
         let download = downloads[0]
 
         print("download of song \(download.song.title!) finished")
@@ -83,23 +91,30 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         }
         
         let fileManager = FileManager.default
-        let libraryPath = NSHomeDirectory() + "/" + download.song.library!.id!
-        let filePath = libraryPath + "/" + download.song.id!
         do {
-            if !fileManager.fileExists(atPath: libraryPath) {
-                try fileManager.createDirectory(atPath: libraryPath, withIntermediateDirectories: false, attributes: nil)
+            
+            let dirUrl = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            let libUrl = dirUrl.appendingPathComponent(download.song.library!.id!)
+            let fileUrl = libUrl.appendingPathComponent(download.song.id!)
+
+            if !fileManager.fileExists(atPath: libUrl.path) {
+                try fileManager.createDirectory(at: libUrl, withIntermediateDirectories: false, attributes: nil)
             }
-            try fileManager.copyItem(at: location, to: URL(fileURLWithPath: filePath))
+            if fileManager.fileExists(atPath: fileUrl.path) {
+                try fileManager.removeItem(at: fileUrl)
+            }
+            try fileManager.moveItem(at: location, to: fileUrl)
             
             download.song.downloadStatus = .Local
-            download.song.filename = filePath
-            
+            download.song.filename = fileUrl.path
+            appDelegate.saveContext()
             
             delegate?.downloadFinished(download)
         }
-        
         catch {
-            print("error trying to create copy file!")
+            download.song.downloadStatus = .Remote
+            appDelegate.saveContext()
+            delegate?.error(error)
         }
     }
     
