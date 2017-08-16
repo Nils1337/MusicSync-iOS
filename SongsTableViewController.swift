@@ -55,6 +55,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -227,6 +228,22 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
         }
         else if cell is LocalSongCell {
             tabBarController?.selectedIndex = 3
+            let songs = fetchedController?.fetchedObjects as! [Song]
+            let localSongs = songs.filter { $0.downloadStatus == .Local }
+            let navController = tabBarController?.selectedViewController as? UINavigationController
+            let playController = navController?.topViewController as? PlayingViewController
+            
+            let i = songs.index(of: cell.song!)
+            
+            guard let index = i else {
+                print("Song not found in fetched songs!")
+                return
+            }
+            
+            let list1 = localSongs[index...localSongs.count - 1]
+            let list2 = localSongs[0...index - 1]
+            let playlist = Array(list1) + Array(list2)
+            playController!.startPlaying(playlist)
         }
     }
     
@@ -245,7 +262,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
     
     func error(_ error: Error) {
         OperationQueue.main.addOperation {
-            let alert = UIAlertController(title: "Download Error", message: "There was an error during download: \(error.localizedDescription)", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Download Error", message: "There was an error during download: \(error)", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
             self.loadData()
@@ -266,7 +283,6 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
         if editingStyle == .delete {
             let cell = tableView.cellForRow(at: indexPath) as! LocalSongCell
             
-            //TODO delete file
             cell.song!.downloadStatus = .Remote
             
             let fileManager = FileManager.default

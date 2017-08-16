@@ -11,6 +11,7 @@ import MMDrawerController
 import CoreData
 import Sync
 import ReachabilitySwift
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -64,6 +65,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //deleteAllData()
         
         NotificationCenter.default.addObserver(self, selector: #selector(trySelectLibrary), name: Notifications.synchronizedNotification, object: nil)
+        
+        //configure audio session
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(AVAudioSessionCategoryPlayback)
+        }
+        catch {
+            print("Setting category of AVAudioSession failed!")
+        }
+        
         return true
     }
 

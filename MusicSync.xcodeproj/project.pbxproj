@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2908B6C41F06E615003883CD /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2908B6C31F06E615003883CD /* TabViewController.swift */; };
+		29155BAB1F43AA4800BBDCF1 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29155BAA1F43AA4800BBDCF1 /* StringExtension.swift */; };
 		292AE7A21EFFDE400067FABB /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7A11EFFDE400067FABB /* Constants.swift */; };
 		292AE7A41EFFEBBD0067FABB /* ArtistsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7A31EFFEBBD0067FABB /* ArtistsTableViewController.swift */; };
 		292AE7A91F002AD00067FABB /* ServersTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7A81F002AD00067FABB /* ServersTableViewController.swift */; };
@@ -29,6 +30,22 @@
 		296835C11EFD4114004BCA50 /* PlaylistsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296835C01EFD4114004BCA50 /* PlaylistsTableViewController.swift */; };
 		296835C31EFD4148004BCA50 /* PlayingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296835C21EFD4148004BCA50 /* PlayingViewController.swift */; };
 		29B800181F24EED8002242CC /* RuntimeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B800171F24EED8002242CC /* RuntimeError.swift */; };
+		29CE43A61F41FAAF00816A90 /* play_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43A21F41FAAF00816A90 /* play_3x.png */; };
+		29CE43A71F41FAAF00816A90 /* play_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43A31F41FAAF00816A90 /* play_2x.png */; };
+		29CE43A81F41FAAF00816A90 /* play_512x512.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43A41F41FAAF00816A90 /* play_512x512.png */; };
+		29CE43A91F41FAAF00816A90 /* play_1x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43A51F41FAAF00816A90 /* play_1x.png */; };
+		29CE43AF1F41FAEB00816A90 /* pause_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43AB1F41FAEB00816A90 /* pause_3x.png */; };
+		29CE43B01F41FAEB00816A90 /* pause_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43AC1F41FAEB00816A90 /* pause_2x.png */; };
+		29CE43B11F41FAEB00816A90 /* pause_1x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43AD1F41FAEB00816A90 /* pause_1x.png */; };
+		29CE43B21F41FAEB00816A90 /* pause_512x512.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43AE1F41FAEB00816A90 /* pause_512x512.png */; };
+		29CE43B81F41FB0700816A90 /* next_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43B41F41FB0700816A90 /* next_3x.png */; };
+		29CE43B91F41FB0700816A90 /* next_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43B51F41FB0700816A90 /* next_2x.png */; };
+		29CE43BA1F41FB0700816A90 /* next_1x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43B61F41FB0700816A90 /* next_1x.png */; };
+		29CE43BB1F41FB0700816A90 /* next_512x512.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43B71F41FB0700816A90 /* next_512x512.png */; };
+		29CE43C11F41FB2100816A90 /* prev_3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43BD1F41FB2100816A90 /* prev_3x.png */; };
+		29CE43C21F41FB2100816A90 /* prev_2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43BE1F41FB2100816A90 /* prev_2x.png */; };
+		29CE43C31F41FB2100816A90 /* prev_1x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43BF1F41FB2100816A90 /* prev_1x.png */; };
+		29CE43C41F41FB2100816A90 /* previous_512x512.png in Resources */ = {isa = PBXBuildFile; fileRef = 29CE43C01F41FB2100816A90 /* previous_512x512.png */; };
 		29D4D2BB1F1EC48C009D9B5B /* SongsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D4D2BA1F1EC48C009D9B5B /* SongsTableViewController.swift */; };
 		29D953E01F1FDDCF0095EE6D /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D953DF1F1FDDCF0095EE6D /* Connectivity.swift */; };
 		29FCB9451F1D2D230000B6FD /* songs_1x.png in Resources */ = {isa = PBXBuildFile; fileRef = 29FCB9411F1D2D230000B6FD /* songs_1x.png */; };
@@ -76,6 +93,7 @@
 /* Begin PBXFileReference section */
 		03CA914FCBD68974E35E3637 /* Pods_MusicSyncUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MusicSyncUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2908B6C31F06E615003883CD /* TabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
+		29155BAA1F43AA4800BBDCF1 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		292AE7A11EFFDE400067FABB /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		292AE7A31EFFEBBD0067FABB /* ArtistsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistsTableViewController.swift; sourceTree = "<group>"; };
 		292AE7A81F002AD00067FABB /* ServersTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServersTableViewController.swift; sourceTree = "<group>"; };
@@ -104,6 +122,22 @@
 		296835C01EFD4114004BCA50 /* PlaylistsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistsTableViewController.swift; sourceTree = "<group>"; };
 		296835C21EFD4148004BCA50 /* PlayingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayingViewController.swift; sourceTree = "<group>"; };
 		29B800171F24EED8002242CC /* RuntimeError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeError.swift; sourceTree = "<group>"; };
+		29CE43A21F41FAAF00816A90 /* play_3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play_3x.png; sourceTree = "<group>"; };
+		29CE43A31F41FAAF00816A90 /* play_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play_2x.png; sourceTree = "<group>"; };
+		29CE43A41F41FAAF00816A90 /* play_512x512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play_512x512.png; sourceTree = "<group>"; };
+		29CE43A51F41FAAF00816A90 /* play_1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play_1x.png; sourceTree = "<group>"; };
+		29CE43AB1F41FAEB00816A90 /* pause_3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause_3x.png; sourceTree = "<group>"; };
+		29CE43AC1F41FAEB00816A90 /* pause_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause_2x.png; sourceTree = "<group>"; };
+		29CE43AD1F41FAEB00816A90 /* pause_1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause_1x.png; sourceTree = "<group>"; };
+		29CE43AE1F41FAEB00816A90 /* pause_512x512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause_512x512.png; sourceTree = "<group>"; };
+		29CE43B41F41FB0700816A90 /* next_3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = next_3x.png; sourceTree = "<group>"; };
+		29CE43B51F41FB0700816A90 /* next_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = next_2x.png; sourceTree = "<group>"; };
+		29CE43B61F41FB0700816A90 /* next_1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = next_1x.png; sourceTree = "<group>"; };
+		29CE43B71F41FB0700816A90 /* next_512x512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = next_512x512.png; sourceTree = "<group>"; };
+		29CE43BD1F41FB2100816A90 /* prev_3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = prev_3x.png; sourceTree = "<group>"; };
+		29CE43BE1F41FB2100816A90 /* prev_2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = prev_2x.png; sourceTree = "<group>"; };
+		29CE43BF1F41FB2100816A90 /* prev_1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = prev_1x.png; sourceTree = "<group>"; };
+		29CE43C01F41FB2100816A90 /* previous_512x512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = previous_512x512.png; sourceTree = "<group>"; };
 		29D4D2BA1F1EC48C009D9B5B /* SongsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SongsTableViewController.swift; sourceTree = "<group>"; };
 		29D953DF1F1FDDCF0095EE6D /* Connectivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connectivity.swift; sourceTree = "<group>"; };
 		29FCB9411F1D2D230000B6FD /* songs_1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = songs_1x.png; sourceTree = "<group>"; };
@@ -178,6 +212,7 @@
 				292AE7A11EFFDE400067FABB /* Constants.swift */,
 				295AB5C71F1E78AC0015EDEA /* DownloadManager.swift */,
 				29D953DF1F1FDDCF0095EE6D /* Connectivity.swift */,
+				29155BAA1F43AA4800BBDCF1 /* StringExtension.swift */,
 			);
 			name = Utility;
 			sourceTree = "<group>";
@@ -276,9 +311,57 @@
 			name = Error;
 			sourceTree = "<group>";
 		};
+		29CE43A11F41FA7E00816A90 /* play */ = {
+			isa = PBXGroup;
+			children = (
+				29CE43A21F41FAAF00816A90 /* play_3x.png */,
+				29CE43A31F41FAAF00816A90 /* play_2x.png */,
+				29CE43A41F41FAAF00816A90 /* play_512x512.png */,
+				29CE43A51F41FAAF00816A90 /* play_1x.png */,
+			);
+			name = play;
+			sourceTree = "<group>";
+		};
+		29CE43AA1F41FAB400816A90 /* pause */ = {
+			isa = PBXGroup;
+			children = (
+				29CE43AB1F41FAEB00816A90 /* pause_3x.png */,
+				29CE43AC1F41FAEB00816A90 /* pause_2x.png */,
+				29CE43AD1F41FAEB00816A90 /* pause_1x.png */,
+				29CE43AE1F41FAEB00816A90 /* pause_512x512.png */,
+			);
+			name = pause;
+			sourceTree = "<group>";
+		};
+		29CE43B31F41FAF400816A90 /* next */ = {
+			isa = PBXGroup;
+			children = (
+				29CE43B41F41FB0700816A90 /* next_3x.png */,
+				29CE43B51F41FB0700816A90 /* next_2x.png */,
+				29CE43B61F41FB0700816A90 /* next_1x.png */,
+				29CE43B71F41FB0700816A90 /* next_512x512.png */,
+			);
+			name = next;
+			sourceTree = "<group>";
+		};
+		29CE43BC1F41FB1100816A90 /* prev */ = {
+			isa = PBXGroup;
+			children = (
+				29CE43BD1F41FB2100816A90 /* prev_3x.png */,
+				29CE43BE1F41FB2100816A90 /* prev_2x.png */,
+				29CE43BF1F41FB2100816A90 /* prev_1x.png */,
+				29CE43C01F41FB2100816A90 /* previous_512x512.png */,
+			);
+			name = prev;
+			sourceTree = "<group>";
+		};
 		29FCB9401F1D2D000000B6FD /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				29CE43BC1F41FB1100816A90 /* prev */,
+				29CE43B31F41FAF400816A90 /* next */,
+				29CE43AA1F41FAB400816A90 /* pause */,
+				29CE43A11F41FA7E00816A90 /* play */,
 				29FCB9651F1D30C00000B6FD /* download */,
 				29FCB95C1F1D2FBF0000B6FD /* playing */,
 				29FCB9531F1D2EDA0000B6FD /* artists */,
@@ -446,6 +529,11 @@
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 8QFLX5HN9Q;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					296835491EC487E7004BCA50 = {
 						CreatedOnToolsVersion = 8.3.2;
@@ -485,27 +573,43 @@
 			buildActionMask = 2147483647;
 			files = (
 				29FCB94F1F1D2E100000B6FD /* playlists_1x.png in Resources */,
+				29CE43BA1F41FB0700816A90 /* next_1x.png in Resources */,
 				29FCB9621F1D2FC60000B6FD /* playing_2x.png in Resources */,
 				29FCB96A1F1D30CD0000B6FD /* download_1x.png in Resources */,
 				29FCB95B1F1D2EE50000B6FD /* artists_512x512.png in Resources */,
 				29FCB96C1F1D30CD0000B6FD /* download_3x.png in Resources */,
 				296835441EC487E7004BCA50 /* LaunchScreen.storyboard in Resources */,
 				29FCB9461F1D2D230000B6FD /* songs_2x.png in Resources */,
+				29CE43B81F41FB0700816A90 /* next_3x.png in Resources */,
+				29CE43C11F41FB2100816A90 /* prev_3x.png in Resources */,
+				29CE43B11F41FAEB00816A90 /* pause_1x.png in Resources */,
+				29CE43C31F41FB2100816A90 /* prev_1x.png in Resources */,
 				29FCB96B1F1D30CD0000B6FD /* download_2x.png in Resources */,
+				29CE43A81F41FAAF00816A90 /* play_512x512.png in Resources */,
 				29FCB9501F1D2E100000B6FD /* playlists_2x.png in Resources */,
 				29FCB96D1F1D30CD0000B6FD /* download_512x512.png in Resources */,
+				29CE43A71F41FAAF00816A90 /* play_2x.png in Resources */,
 				29FCB9511F1D2E100000B6FD /* playlists_3x.png in Resources */,
+				29CE43B21F41FAEB00816A90 /* pause_512x512.png in Resources */,
 				29FCB9481F1D2D230000B6FD /* songs_512x512.png in Resources */,
+				29CE43BB1F41FB0700816A90 /* next_512x512.png in Resources */,
+				29CE43C41F41FB2100816A90 /* previous_512x512.png in Resources */,
+				29CE43B01F41FAEB00816A90 /* pause_2x.png in Resources */,
 				29FCB9641F1D2FC60000B6FD /* playing_512x512.png in Resources */,
+				29CE43AF1F41FAEB00816A90 /* pause_3x.png in Resources */,
 				29FCB9521F1D2E100000B6FD /* playlists_512x512.png in Resources */,
 				29FCB9631F1D2FC60000B6FD /* playing_1x.png in Resources */,
 				29FCB9451F1D2D230000B6FD /* songs_1x.png in Resources */,
 				296835411EC487E7004BCA50 /* Assets.xcassets in Resources */,
+				29CE43C21F41FB2100816A90 /* prev_2x.png in Resources */,
 				29FCB95A1F1D2EE50000B6FD /* artists_1x.png in Resources */,
+				29CE43B91F41FB0700816A90 /* next_2x.png in Resources */,
 				29FCB9581F1D2EE50000B6FD /* artists_3x.png in Resources */,
 				29FCB9591F1D2EE50000B6FD /* artists_2x.png in Resources */,
 				2968353F1EC487E7004BCA50 /* Main.storyboard in Resources */,
 				29FCB9471F1D2D230000B6FD /* songs_3x.png in Resources */,
+				29CE43A61F41FAAF00816A90 /* play_3x.png in Resources */,
+				29CE43A91F41FAAF00816A90 /* play_1x.png in Resources */,
 				29FCB9611F1D2FC60000B6FD /* playing_3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -681,6 +785,7 @@
 				296835BD1EFD40CA004BCA50 /* AlbumsTableViewController.swift in Sources */,
 				2963B1601F0FC093009857CE /* SettingsTableViewController.swift in Sources */,
 				292AE7AF1F03FA980067FABB /* LibraryTableViewController.swift in Sources */,
+				29155BAB1F43AA4800BBDCF1 /* StringExtension.swift in Sources */,
 				292AE7B21F06B3460067FABB /* SynchronizeOperation.swift in Sources */,
 				2968356D1EFAD08C004BCA50 /* DataModel.xcdatamodeld in Sources */,
 				292AE7AD1F0031510067FABB /* ServerDetailViewController.swift in Sources */,

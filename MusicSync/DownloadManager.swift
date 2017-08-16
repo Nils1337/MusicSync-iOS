@@ -90,12 +90,43 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
             download.task.resume()
         }
         
+        guard let response = downloadTask.response else {
+            delegate?.error(RuntimeError.Message("No response!"))
+            return
+        }
+        
+        guard let mime = response.mimeType else {
+            delegate?.error(RuntimeError.Message("No mime type specified in response!"))
+            return
+        }
+        
+        guard mime.hasPrefix("audio") else {
+            delegate?.error(RuntimeError.Message("Wrong mime type!"))
+            return
+        }
+        
+        guard mime.hasSuffix("mpeg") else {
+            delegate?.error(RuntimeError.Message("Wrong mime type!"))
+            return
+        }
+        
+        let pathExtension = "mp3"
+        
+        /*let i = mime.lastIndex(of: "/")
+        
+        guard let index = i else {
+            delegate?.error(RuntimeError.Message("Wrong mime type!"))
+            return
+        }
+        
+        let pathExtension = mime.substring(from: mime.index(mime.startIndex, offsetBy: index + 1))
+        */
         let fileManager = FileManager.default
         do {
             
             let dirUrl = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             let libUrl = dirUrl.appendingPathComponent(download.song.library!.id!)
-            let fileUrl = libUrl.appendingPathComponent(download.song.id!)
+            let fileUrl = libUrl.appendingPathComponent(download.song.id!).appendingPathExtension(pathExtension)
 
             if !fileManager.fileExists(atPath: libUrl.path) {
                 try fileManager.createDirectory(at: libUrl, withIntermediateDirectories: false, attributes: nil)
@@ -105,8 +136,11 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
             }
             try fileManager.moveItem(at: location, to: fileUrl)
             
+            
             download.song.downloadStatus = .Local
-            download.song.filename = fileUrl.path
+            download.song.filename = libUrl.lastPathComponent + "/" + fileUrl.lastPathComponent
+            print(download.song.filename!)
+
             appDelegate.saveContext()
             
             delegate?.downloadFinished(download)

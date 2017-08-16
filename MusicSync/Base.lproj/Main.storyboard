@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -317,7 +317,73 @@
                     <view key="view" contentMode="scaleToFill" id="C15-0I-Iik">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OVA-qI-IFd">
+                                <rect key="frame" x="36" y="84" width="303" height="303"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="OVA-qI-IFd" secondAttribute="height" multiplier="1:1" id="yF6-s8-vKc"/>
+                                </constraints>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uDZ-aF-l9r">
+                                <rect key="frame" x="175" y="527" width="25" height="25"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" button="YES" image="YES"/>
+                                </accessibility>
+                                <state key="normal" title="Button" image="play"/>
+                                <connections>
+                                    <action selector="playOrPause:" destination="bjh-mS-X2V" eventType="touchUpInside" id="HTR-dl-Ime"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WoL-Ul-d82">
+                                <rect key="frame" x="245" y="527" width="25" height="25"/>
+                                <state key="normal" title="Button" image="next"/>
+                                <connections>
+                                    <action selector="next" destination="bjh-mS-X2V" eventType="touchUpInside" id="Vxa-up-MXt"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VqB-0e-UhG">
+                                <rect key="frame" x="90" y="527" width="25" height="25"/>
+                                <state key="normal" title="Button" image="prev"/>
+                                <connections>
+                                    <action selector="prev" destination="bjh-mS-X2V" eventType="touchUpInside" id="jMw-Kr-7Qr"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jPS-52-1SP">
+                                <rect key="frame" x="36" y="442" width="303" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" ambiguous="YES" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="HMV-bU-p2a">
+                                <rect key="frame" x="36" y="408" width="303" height="2"/>
+                            </progressView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Artist" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7e4-mu-kFR">
+                                <rect key="frame" x="36" y="466" width="303" height="14.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="7e4-mu-kFR" firstAttribute="leading" secondItem="C15-0I-Iik" secondAttribute="leadingMargin" constant="20" id="2wh-ix-Ur3"/>
+                            <constraint firstItem="jPS-52-1SP" firstAttribute="leading" secondItem="C15-0I-Iik" secondAttribute="leadingMargin" constant="20" id="4WR-1v-CWc"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="jPS-52-1SP" secondAttribute="trailing" constant="20" id="4eP-fS-K0M"/>
+                            <constraint firstItem="jPS-52-1SP" firstAttribute="top" relation="greaterThanOrEqual" secondItem="HMV-bU-p2a" secondAttribute="bottom" constant="20" id="94G-RF-OlC"/>
+                            <constraint firstItem="WoL-Ul-d82" firstAttribute="centerY" secondItem="uDZ-aF-l9r" secondAttribute="centerY" id="Cmj-2P-hdG"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="HMV-bU-p2a" secondAttribute="trailing" constant="20" id="Eth-HO-Yao"/>
+                            <constraint firstItem="uDZ-aF-l9r" firstAttribute="centerX" secondItem="C15-0I-Iik" secondAttribute="centerX" id="HLY-rX-jIU"/>
+                            <constraint firstItem="uDZ-aF-l9r" firstAttribute="top" relation="greaterThanOrEqual" secondItem="7e4-mu-kFR" secondAttribute="bottom" constant="10" id="KST-E8-3iy"/>
+                            <constraint firstItem="7e4-mu-kFR" firstAttribute="top" secondItem="jPS-52-1SP" secondAttribute="bottom" constant="5" id="OZB-hb-8Uw"/>
+                            <constraint firstItem="OcR-kI-HcB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="OVA-qI-IFd" secondAttribute="bottom" constant="200" id="Olg-D4-P4O"/>
+                            <constraint firstItem="uDZ-aF-l9r" firstAttribute="leading" secondItem="VqB-0e-UhG" secondAttribute="trailing" constant="30" id="QQa-0W-kYP"/>
+                            <constraint firstItem="WoL-Ul-d82" firstAttribute="leading" secondItem="uDZ-aF-l9r" secondAttribute="trailing" constant="30" id="WXa-p5-mtP"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="7e4-mu-kFR" secondAttribute="trailing" constant="20" id="fdP-YP-4O5"/>
+                            <constraint firstItem="OcR-kI-HcB" firstAttribute="top" secondItem="uDZ-aF-l9r" secondAttribute="bottom" constant="30" id="gTr-1F-bHD"/>
+                            <constraint firstItem="HMV-bU-p2a" firstAttribute="leading" secondItem="C15-0I-Iik" secondAttribute="leadingMargin" constant="20" id="j7r-ao-qxW"/>
+                            <constraint firstItem="VqB-0e-UhG" firstAttribute="centerY" secondItem="uDZ-aF-l9r" secondAttribute="centerY" id="o3p-0O-enc"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Playing" id="Aej-ao-n79">
                         <barButtonItem key="leftBarButtonItem" title="Drawer" id="IoE-xW-nOr" customClass="MMDrawerBarButtonItem">
@@ -331,6 +397,13 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="artistView" destination="7e4-mu-kFR" id="VPD-wx-Vvf"/>
+                        <outlet property="imageView" destination="OVA-qI-IFd" id="XUm-Mb-EOL"/>
+                        <outlet property="playButton" destination="uDZ-aF-l9r" id="UAB-uO-V4y"/>
+                        <outlet property="progressView" destination="HMV-bU-p2a" id="xz5-Lf-FDa"/>
+                        <outlet property="titleView" destination="jPS-52-1SP" id="5jR-zz-IzW"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="919-R8-pfb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -775,12 +848,15 @@
     <resources>
         <image name="artists" width="25" height="25"/>
         <image name="download" width="25" height="25"/>
+        <image name="next" width="25" height="25"/>
+        <image name="play" width="25" height="25"/>
         <image name="playing" width="25" height="25"/>
         <image name="playlists" width="25" height="25"/>
+        <image name="prev" width="25" height="25"/>
         <image name="songs" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="etv-IB-485"/>
+        <segue reference="wd8-hI-26v"/>
         <segue reference="aNc-Zv-PyS"/>
     </inferredMetricsTieBreakers>
 </document>
