@@ -35,8 +35,10 @@ class SynchronizeOperation: Operation {
             return
         }
         do {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
             try getLibraries()
             try getSongs()
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
         }
         catch {
             print("Error during synchronization")

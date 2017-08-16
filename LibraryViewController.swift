@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import MMDrawerController
 
-class LibraryCell: UITableViewCell, NSFetchedResultsControllerDelegate {
+class LibraryCell: UITableViewCell {
     
     @IBOutlet weak var nameLabel: UILabel!
     var library: Library?
@@ -21,15 +21,32 @@ class LibraryCell: UITableViewCell, NSFetchedResultsControllerDelegate {
     }
 }
 
-class LibraryTableViewController: UITableViewController {
+class DrawerServerCell: UITableViewCell {
+    @IBOutlet weak var nameLabel: UILabel!
+    var server: Server?
+    
+    func setData(_ server: Server) {
+        self.server = server
+        nameLabel.text = server.name
+    }
+}
 
+class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    @IBOutlet weak var tableView: UITableView!
+
+    @IBOutlet weak var headerView: UIImageView!
+    
+    var data = [Any]()
+    
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
 
     override func viewDidLoad() {
-        super.viewDidLoad()
         
-        loadData()
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
+        super.viewDidLoad()
         
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.serverAddedNotification, object: nil)
@@ -45,51 +62,74 @@ class LibraryTableViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        loadData()
+    }
 
     // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        if let frc = fetchedController {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        /*if let frc = fetchedController {
             return frc.sections!.count
         }
-        return 0
+        return 0*/
+        return 1
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let sections = self.fetchedController?.sections else {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        /*guard let sections = self.fetchedController?.sections else {
             fatalError("No sections in fetchedResultsController")
         }
         
         let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        return sectionInfo.numberOfObjects*/
+        return data.count
     }
 
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "libraryCell", for: indexPath) as! LibraryCell
-     
-        guard let object = self.fetchedController?.object(at: indexPath) else {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let object = data[indexPath.row]
+        
+        if let server = object as? Server {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "drawerServerCell", for: indexPath) as! DrawerServerCell
+            cell.setData(server)
+            cell.selectionStyle = .none
+            return cell
+        } else if let library = object as? Library {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "libraryCell", for: indexPath) as! LibraryCell
+            cell.setData(library)
+            return cell
+        } else {
             fatalError("Attempt to configure cell without managed object")
         }
-     
-        let result = object as! Library
-        
-        cell.setData(result)
-        return cell
     }
  
     private func loadData() {
 
         let ctx = appDelegate.dataStack.mainContext
         
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Server")
         request.resultType = .managedObjectResultType
-        let s1 = NSSortDescriptor(key: LibraryTable.serverColumnName, ascending: true)
-        let s2 = NSSortDescriptor(key: LibraryTable.nameColumnName, ascending: true)
-        request.sortDescriptors = [s1, s2]
-        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: ctx, sectionNameKeyPath: #keyPath(Library.server), cacheName: nil)
+        let s = NSSortDescriptor(key: ServerTable.nameColumnName, ascending: true)
+        request.sortDescriptors = [s]
         do {
-            try fetchedController!.performFetch()
+            let servers = try ctx.fetch(request) as! [Server]
+            data = servers
+            for server: Server in servers {
+                let libRequest  = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
+                libRequest.resultType = .managedObjectResultType
+                libRequest.sortDescriptors = [NSSortDescriptor(key: LibraryTable.nameColumnName, ascending: true)]
+                libRequest.predicate = NSPredicate(format: "\(LibraryTable.serverColumnName).\(ServerTable.nameColumnName) = %@", server.name!)
+                let libraries = try ctx.fetch(libRequest) as! [Library]
+                libraries.reversed().forEach {
+                    data.insert($0, at: 1 + data.index(where: {
+                        s in
+                        return s as? Server == server
+                    })!)
+                }
+            }
         }
         catch {
             fatalError("Failed to fetch entities: \(error)")
@@ -97,14 +137,14 @@ class LibraryTableViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    /*func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let sectionInfo = fetchedController?.sections?[section]
         let library = sectionInfo?.objects?[0] as? Library
         guard let server = library?.server else {
             return "error"
         }
         return "\(server.name!) @ \(server.url!)"
-    }
+    }*/
     
     func reload(_ notification: NSNotification) {
         OperationQueue.main.addOperation {
@@ -112,8 +152,10 @@ class LibraryTableViewController: UITableViewController {
         }
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let cell = tableView.cellForRow(at: indexPath) as! LibraryCell
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) as? LibraryCell else {
+            return
+        }
         let library = cell.library
         appDelegate.server = library?.server
         appDelegate.library = library

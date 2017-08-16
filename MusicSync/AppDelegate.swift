@@ -49,7 +49,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let drawerViewController = mainStoryboard.instantiateViewController(withIdentifier: "DrawerController") as UIViewController
         
-        drawerContainer = MMDrawerController(center: centerViewController, leftDrawerViewController: drawerViewController)
+        let nav = UINavigationController()
+        nav.setViewControllers([drawerViewController], animated: false)
+        nav.title = "Libraries"
+        
+        drawerContainer = MMDrawerController(center: centerViewController, leftDrawerViewController: nav)
         drawerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.bezelPanningCenterView
         drawerContainer?.closeDrawerGestureModeMask = [MMCloseDrawerGestureMode.panningCenterView, MMCloseDrawerGestureMode.panningDrawerView, MMCloseDrawerGestureMode.tapCenterView]
         drawerContainer?.showsShadow = false
@@ -58,6 +62,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         window!.rootViewController = drawerContainer
         window!.makeKeyAndVisible()
+        
+        
+        UINavigationBar.appearance().barTintColor = UIColor.navBarColor()
+        UINavigationBar.appearance().isTranslucent = false
+        UINavigationBar.appearance().tintColor = UIColor.white
+        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
         
         /*let defaults = UserDefaults.standard
          let serverName = defaults.object(forKey: serverKey)

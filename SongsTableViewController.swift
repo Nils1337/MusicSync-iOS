@@ -221,6 +221,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
                 self.present(alert, animated: true, completion: nil)
             }
             else {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = true
                 DownloadManager.shared.addDownload(server: server, song: song)
                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
             }
@@ -253,6 +254,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
     
     func downloadFinished(_ download: Download) {
         OperationQueue.main.addOperation {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
             self.loadData()
         }
     }
@@ -262,6 +264,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
     
     func error(_ error: Error) {
         OperationQueue.main.addOperation {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
             let alert = UIAlertController(title: "Download Error", message: "There was an error during download: \(error)", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)

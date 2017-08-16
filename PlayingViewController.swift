@@ -30,25 +30,30 @@ class PlayingViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        updateView(items[index])
+        if (items.count > 0) {
+            updateView(items[index])
         
-        let interval = CMTime(seconds: 0.25,
+            let interval = CMTime(seconds: 0.25,
                               preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-        observerToken = player.addPeriodicTimeObserver(forInterval: interval, queue: DispatchQueue.main) {
-            [weak self] (time: CMTime) in
+            observerToken = player.addPeriodicTimeObserver(forInterval: interval, queue: DispatchQueue.main) {
+                [weak self] (time: CMTime) in
             
-            print(time)
+                print(time)
             
-            guard self != nil else {
-                return;
+                guard self != nil else {
+                    return;
+                }
+            
+                self!.progressView.setProgress(Float(time.seconds) / Float(self!.items[self!.index].duration.seconds), animated: true)
             }
-            
-            self!.progressView.setProgress(Float(time.seconds) / Float(self!.items[self!.index].duration.seconds), animated: true)
         }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        player.removeTimeObserver(observerToken!)
+        if observerToken != nil {
+            player.removeTimeObserver(observerToken!)
+            observerToken = nil
+        }
     }
     
     override func didReceiveMemoryWarning() {
