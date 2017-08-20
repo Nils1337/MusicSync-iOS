@@ -178,6 +178,12 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
             server!.url = vc.addressField.text
             server!.port = Int16(vc.portField.text!)!
             
+            switch (vc.protocolPicker.selectedRow(inComponent: 0)) {
+            case 0: server!.prot = .Http
+            case 1: server!.prot = .Https
+            default: server!.prot = .Https
+            }
+            
             appDelegate.saveContext()
             if adding {
                 NotificationCenter.default.post(name: Notifications.serverAddedNotification, object: server)

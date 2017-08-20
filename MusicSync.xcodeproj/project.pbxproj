@@ -16,6 +16,8 @@
 		292AE7A91F002AD00067FABB /* ServersTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7A81F002AD00067FABB /* ServersTableViewController.swift */; };
 		292AE7AD1F0031510067FABB /* ServerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7AC1F0031510067FABB /* ServerDetailViewController.swift */; };
 		292AE7B21F06B3460067FABB /* SynchronizeOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292AE7B11F06B3460067FABB /* SynchronizeOperation.swift */; };
+		292FCE7E1F47425800D5C2F4 /* Server+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292FCE7C1F47425800D5C2F4 /* Server+CoreDataClass.swift */; };
+		292FCE7F1F47425800D5C2F4 /* Server+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292FCE7D1F47425800D5C2F4 /* Server+CoreDataProperties.swift */; };
 		295AB5C81F1E78AC0015EDEA /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295AB5C71F1E78AC0015EDEA /* DownloadManager.swift */; };
 		295AB5CE1F1EA4C60015EDEA /* Song+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295AB5CC1F1EA4C60015EDEA /* Song+CoreDataClass.swift */; };
 		295AB5CF1F1EA4C60015EDEA /* Song+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295AB5CD1F1EA4C60015EDEA /* Song+CoreDataProperties.swift */; };
@@ -102,6 +104,8 @@
 		292AE7A81F002AD00067FABB /* ServersTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServersTableViewController.swift; sourceTree = "<group>"; };
 		292AE7AC1F0031510067FABB /* ServerDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerDetailViewController.swift; sourceTree = "<group>"; };
 		292AE7B11F06B3460067FABB /* SynchronizeOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SynchronizeOperation.swift; sourceTree = "<group>"; };
+		292FCE7C1F47425800D5C2F4 /* Server+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Server+CoreDataClass.swift"; sourceTree = "<group>"; };
+		292FCE7D1F47425800D5C2F4 /* Server+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Server+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		295AB5C71F1E78AC0015EDEA /* DownloadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
 		295AB5CC1F1EA4C60015EDEA /* Song+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Song+CoreDataClass.swift"; sourceTree = "<group>"; };
 		295AB5CD1F1EA4C60015EDEA /* Song+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Song+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -230,6 +234,8 @@
 		295AB5C91F1E9B3E0015EDEA /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				292FCE7C1F47425800D5C2F4 /* Server+CoreDataClass.swift */,
+				292FCE7D1F47425800D5C2F4 /* Server+CoreDataProperties.swift */,
 				295AB5CC1F1EA4C60015EDEA /* Song+CoreDataClass.swift */,
 				295AB5CD1F1EA4C60015EDEA /* Song+CoreDataProperties.swift */,
 			);
@@ -793,6 +799,7 @@
 				291481EE1F44B0E30085E3F9 /* LibraryViewController.swift in Sources */,
 				295AB5C81F1E78AC0015EDEA /* DownloadManager.swift in Sources */,
 				291481F11F44BD530085E3F9 /* UIColorExtension.swift in Sources */,
+				292FCE7F1F47425800D5C2F4 /* Server+CoreDataProperties.swift in Sources */,
 				295AB5CF1F1EA4C60015EDEA /* Song+CoreDataProperties.swift in Sources */,
 				295AB5CE1F1EA4C60015EDEA /* Song+CoreDataClass.swift in Sources */,
 				296835BD1EFD40CA004BCA50 /* AlbumsTableViewController.swift in Sources */,
@@ -800,6 +807,7 @@
 				29155BAB1F43AA4800BBDCF1 /* StringExtension.swift in Sources */,
 				292AE7B21F06B3460067FABB /* SynchronizeOperation.swift in Sources */,
 				2968356D1EFAD08C004BCA50 /* DataModel.xcdatamodeld in Sources */,
+				292FCE7E1F47425800D5C2F4 /* Server+CoreDataClass.swift in Sources */,
 				292AE7AD1F0031510067FABB /* ServerDetailViewController.swift in Sources */,
 				296835C11EFD4114004BCA50 /* PlaylistsTableViewController.swift in Sources */,
 				29D4D2BB1F1EC48C009D9B5B /* SongsTableViewController.swift in Sources */,

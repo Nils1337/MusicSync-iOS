@@ -241,10 +241,15 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
                 return
             }
             
-            let list1 = localSongs[index...localSongs.count - 1]
-            let list2 = localSongs[0...index - 1]
-            let playlist = Array(list1) + Array(list2)
-            playController!.startPlaying(playlist)
+            var playlist: [Song]?
+            if (index > 0) {
+                let list1 = localSongs[index...localSongs.count - 1]
+                let list2 = localSongs[0...index - 1]
+                playlist = Array(list1) + Array(list2)
+            } else {
+                playlist = localSongs
+            }
+            playController!.startPlaying(playlist!)
         }
     }
     

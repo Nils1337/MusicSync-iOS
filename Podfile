@@ -9,6 +9,7 @@ target 'MusicSync' do
   pod 'MMDrawerController'
   pod 'Sync', :git => 'https://github.com/Nils1337/Sync.git'
   pod 'ReachabilitySwift'
+  pod 'Validator'
   
   target 'MusicSyncTests' do
     #inherit! :search_paths‚

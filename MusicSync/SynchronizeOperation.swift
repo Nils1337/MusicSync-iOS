@@ -47,7 +47,8 @@ class SynchronizeOperation: Operation {
     
     
     func getLibraries() throws {
-        let url = URL(string: "http://" + server!.url! + ":" + String(server!.port) + libraryUrl)
+        let prot = server!.prot == .Http ? "http" : "https"
+        let url = URL(string: prot + "://" + server!.url! + ":" + String(server!.port) + libraryUrl)
         let request = URLRequest(url: url!)
         let session = URLSession.shared
         let task = session.dataTask(with: request) {
@@ -102,7 +103,8 @@ class SynchronizeOperation: Operation {
     
 
     func getSongs() throws {
-        let s = "http://" + server!.url! + ":" + String(server!.port) + songUrl
+        let prot = server!.prot == .Http ? "http" : "https"
+        let s = prot + "://" + server!.url! + ":" + String(server!.port) + songUrl
         let url = URL(string: s)
         let request = URLRequest(url: url!)
         let session = URLSession.shared

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16F73" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="12141" systemVersion="16G29" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Library" representedClassName="Library" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="String" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
         <relationship name="server" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Server" inverseName="libraries" inverseEntity="Server" syncable="YES"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Song" inverseName="library" inverseEntity="Song" syncable="YES"/>
     </entity>
-    <entity name="Server" representedClassName=".Server" syncable="YES" codeGenerationType="class">
+    <entity name="Server" representedClassName=".Server" syncable="YES">
         <attribute name="name" attributeType="String" syncable="YES">
             <userInfo>
                 <entry key="sync.isPrimaryKey" value="true"/>
@@ -14,6 +14,7 @@
         </attribute>
         <attribute name="path" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="port" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="prot" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="libraries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Library" inverseName="server" inverseEntity="Library" syncable="YES"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Song" inverseName="server" inverseEntity="Song" syncable="YES"/>
@@ -30,7 +31,7 @@
     </entity>
     <elements>
         <element name="Library" positionX="-549" positionY="-6" width="128" height="105"/>
-        <element name="Server" positionX="-281" positionY="9" width="128" height="135"/>
+        <element name="Server" positionX="-281" positionY="9" width="128" height="150"/>
         <element name="Song" positionX="-828" positionY="18" width="128" height="165"/>
     </elements>
 </model>

@@ -47,7 +47,8 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
     }
     
     func addDownload(server: Server, song: Song) {
-        let url = URL(string: "http://" + server.url! + ":" + String(server.port) + DownloadManager.downloadUrl + "/" + song.id!)
+        let prot = server.prot == .Http ? "http" : "https"
+        let url = URL(string: "\(prot)://\(server.url!):\(String(server.port))\(DownloadManager.downloadUrl)/\(song.id!)")
         let request = URLRequest(url: url!)
         let download = session.downloadTask(with: request)
         downloads.append(Download(song: song, task: download))
