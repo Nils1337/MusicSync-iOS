@@ -21,17 +21,23 @@
     </entity>
     <entity name="Song" representedClassName="Song" syncable="YES">
         <attribute name="album" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="albumArtist" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="artist" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="downloadStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="duration" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="filename" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" syncable="YES"/>
+        <attribute name="picture" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tracknr" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="tracks" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="year" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="library" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Library" inverseName="songs" inverseEntity="Library" syncable="YES"/>
         <relationship name="server" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Server" inverseName="songs" inverseEntity="Server" syncable="YES"/>
     </entity>
     <elements>
         <element name="Library" positionX="-549" positionY="-6" width="128" height="105"/>
         <element name="Server" positionX="-281" positionY="9" width="128" height="150"/>
-        <element name="Song" positionX="-828" positionY="18" width="128" height="165"/>
+        <element name="Song" positionX="-828" positionY="18" width="128" height="255"/>
     </elements>
 </model>

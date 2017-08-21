@@ -26,6 +26,9 @@ extension Song {
     @NSManaged public var filename: String?
     @NSManaged public var id: String?
     @NSManaged public var title: String?
+    @NSManaged public var tracknr: Int16
+    @NSManaged public var duration: Int16
+    @NSManaged public var picture: Data?
     @NSManaged public var library: Library?
     @NSManaged public var server: Server?
 

@@ -214,6 +214,16 @@ class SongDelegate: SyncDelegate {
         }
         update.removeValue(forKey: SongTable.libraryColumnName)
         
+        //Decode picture
+        if let pictureEncoded = update[SongTable.pictureColumnName] as? String {
+            let picture = Data(base64Encoded: pictureEncoded)
+            if let pic = picture {
+                update.updateValue(pic, forKey: SongTable.pictureColumnName)
+            } else {
+                update.removeValue(forKey: SongTable.pictureColumnName)
+            }
+        }
+        
         return update
     }
     
@@ -224,17 +234,31 @@ class SongDelegate: SyncDelegate {
         
         var update = json;
         
+        //update server
         if let server = song.server {
             update.updateValue(server.name!, forKey: SongTable.serverColumnName + "_id")
         }
         
+        //update library
         if let library = update[SongTable.libraryColumnName] {
             update.updateValue(library, forKey: SongTable.libraryColumnName + "_id")
         }
         update.removeValue(forKey: SongTable.libraryColumnName)
         
+        //Decode picture
+        if let pictureEncoded = update[SongTable.pictureColumnName] as? String {
+            let picture = Data(base64Encoded: pictureEncoded)
+            if let pic = picture {
+                update.updateValue(pic, forKey: SongTable.pictureColumnName)
+            } else {
+                update.removeValue(forKey: SongTable.pictureColumnName)
+            }
+        }
+        
+        //update downloadStatus
         update.updateValue(song.downloadStatus.rawValue, forKey: "download_status")
 
+        //update filename
         if let filename = update[SongTable.filenameColumnName] {
             update.updateValue(filename, forKey: SongTable.filenameColumnName)
         }

@@ -9,49 +9,76 @@
 import UIKit
 import CoreData
 
-class SongCell: UITableViewCell {
+protocol DataCell {
+    var song: Song? { get set }
+    func setData(_ song: Song)
+}
+
+class LocalSongCell: UITableViewCell, DataCell {
+    let gesture = UILongPressGestureRecognizer()
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var trackNrLabel: UILabel!
+    @IBOutlet weak var durationLabel: UILabel!
     var song: Song?
-    weak var download: URLSessionDownloadTask?
     
     func setData(_ song: Song) {
         self.song = song
         titleLabel.text = song.title
+        artistLabel.text = song.artist
+        trackNrLabel.text = String(song.tracknr)
+        let seconds = song.duration % 60
+        let minutes = song.duration / 60
+        durationLabel.text = String(format: "%02d:%02d", minutes, seconds)
     }
 }
 
-class LocalSongCell: SongCell {
-    let gesture = UILongPressGestureRecognizer()
-}
-
-class DownloadingSongCell: SongCell {
+class DownloadingSongCell: UITableViewCell, DataCell {
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var trackNrLabel: UILabel!
+    @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
-
+    var song: Song?
+    
+    func setData(_ song: Song) {
+        self.song = song
+        titleLabel.text = song.title
+        artistLabel.text = song.artist
+        trackNrLabel.text = String(song.tracknr)
+        let seconds = song.duration % 60
+        let minutes = song.duration / 60
+        durationLabel.text = String(format: "%02d:%02d", minutes, seconds)
+        loadingIndicator.startAnimating()
+    }
 }
 
-class RemoteSongCell: SongCell {
+class RemoteSongCell: UITableViewCell, DataCell {
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var trackNrLabel: UILabel!
+    @IBOutlet weak var durationLabel: UILabel!
+    @IBOutlet weak var remoteImage: UIImageView!
+    var song: Song?
     
+    func setData(_ song: Song) {
+        self.song = song
+        titleLabel.text = song.title
+        artistLabel.text = song.artist
+        trackNrLabel.text = String(song.tracknr)
+        let seconds = song.duration % 60
+        let minutes = song.duration / 60
+        durationLabel.text = String(format: "%02d:%02d", minutes, seconds)
+    }
 }
 
 class SongsTableViewController: UITableViewController, DownloadDelegate {
     
-    var artist: String?  {
-        didSet(oldValue) {
-            updateTitle()
-        }
-    }
-    var album: String?  {
-        didSet(oldValue) {
-            updateTitle()
-        }
-    }
+    var artist: String?
+    var album: String?
     var playlist: String?
     var songlist: [String]?
-    var library: Library? {
-        didSet(oldValue) {
-            updateTitle()
-        }
-    }
+    var library: Library?
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
@@ -62,7 +89,6 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
         DownloadManager.shared.delegate = self
 
         library = appDelegate.library
-        updateTitle()
         loadData()
         
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
@@ -108,47 +134,25 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
             fatalError("Object fetched from database is not a song!")
         }
         
-        var cell: SongCell
+        var cell: DataCell
         
         switch (song.downloadStatus) {
             case .Remote:
-                cell = tableView.dequeueReusableCell(withIdentifier: "remoteSongCell", for: indexPath) as! SongCell
-                cell.setEditing(false, animated: true)
+                cell = tableView.dequeueReusableCell(withIdentifier: "remoteSongCell", for: indexPath) as! DataCell
                 break
             case .Downloading:
-                cell = tableView.dequeueReusableCell(withIdentifier: "downloadingSongCell", for: indexPath) as! SongCell
-                let downloadCell = cell as! DownloadingSongCell
-                downloadCell.loadingIndicator.startAnimating()
+                cell = tableView.dequeueReusableCell(withIdentifier: "downloadingSongCell", for: indexPath) as! DataCell
                 break
             case .Local:
-                let localCell = tableView.dequeueReusableCell(withIdentifier: "localSongCell", for: indexPath) as! LocalSongCell
-                /*localCell.gesture.addTarget(self, action: #selector(localCellPressedLong))
-                localCell.gestureRecognizers = []
-                localCell.gestureRecognizers!.append(localCell.gesture)*/
-                cell = localCell
+                cell = tableView.dequeueReusableCell(withIdentifier: "localSongCell", for: indexPath) as! DataCell
                 break
         }
         
         cell.setData(song)
         
-        return cell
+        return cell as! UITableViewCell
     }
-    
-    private func updateTitle() {
-        var title = "No Library Selected"
-        if (library != nil) {
-            if (album == nil && artist == nil) {
-                title = "All Songs"
-            }
-            else if (album == nil && artist != nil) {
-                title = "All Songs of \(artist!)"
-            }
-            else if (album != nil && artist != nil) {
-                title = album!
-            }
-        }
-        self.navigationItem.title = title
-    }
+
     
     private func loadData() {
         
@@ -197,12 +201,8 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
         }
     }
     
-    @IBAction func drawerButtonClicked(_ sender: Any) {
-        (self.tabBarController as! TabViewController).toggleDrawer()
-    }
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let cell = tableView.cellForRow(at: indexPath) as! SongCell
+        let cell = tableView.cellForRow(at: indexPath) as! DataCell
         if cell is RemoteSongCell {
             
             guard let song = cell.song else {

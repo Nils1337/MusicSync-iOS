@@ -17,6 +17,8 @@ struct SongTable {
     static let idColumnName = "id"
     static let downloadStatusColumnName = "downloadStatus"
     static let filenameColumnName = "filename"
+    static let pictureColumnName = "picture"
+    static let yearColumnName = "year"
 }
 
 struct ServerTable {

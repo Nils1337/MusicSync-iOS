@@ -12,10 +12,20 @@ import CoreData
 class AlbumCell: UITableViewCell {
     var album: String?
     @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var pictureView: UIImageView!
+    @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var yearView: UILabel!
     
     func setData(_ dbResult: NSDictionary) {
         album = dbResult[SongTable.albumColumnName] as? String
         nameLabel.text = album
+        artistLabel.text = dbResult[SongTable.artistColumnName] as? String
+        if let year = dbResult[SongTable.yearColumnName] as? Int {
+            yearView.text = String(describing: year)
+        }
+        if let picture = dbResult[SongTable.pictureColumnName] as? Data {
+            pictureView.image = UIImage(data: picture)
+        }
     }
 }
 
@@ -85,7 +95,7 @@ class AlbumsTableViewController: UITableViewController {
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
         request.resultType = .dictionaryResultType
-        request.propertiesToFetch = [SongTable.albumColumnName]
+        request.propertiesToFetch = [SongTable.albumColumnName, SongTable.pictureColumnName, SongTable.artistColumnName, SongTable.yearColumnName]
         request.returnsDistinctResults = true
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.albumColumnName, ascending: true)]
         request.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", artist, library.id!)
@@ -157,7 +167,7 @@ class AlbumsTableViewController: UITableViewController {
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let songVC = segue.destination as? SongsTableViewController {
+        if let songVC = segue.destination as? SongsOfAlbumViewController {
             songVC.artist = artist
             if let albumCell = sender as? AlbumCell {
                 songVC.album = albumCell.album

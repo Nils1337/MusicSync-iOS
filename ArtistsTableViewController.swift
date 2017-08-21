@@ -11,18 +11,36 @@ import CoreData
 
 class ArtistCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var pictureView: UIImageView!
+    @IBOutlet weak var countView: UILabel!
+    
     var artist: String?
     
-    func setData(_ dbResult: NSDictionary) {
+    func setData(_ dbResult: NSDictionary,_ metadata: Metadata) {
         artist = dbResult[SongTable.artistColumnName] as? String
         nameLabel.text = artist
+        
+        if let picture = metadata.picture {
+            pictureView.image = UIImage(data: picture as Data)
+        }
+        
+        countView.text = "\(metadata.albumCount) Albums, \(metadata.songCount) Songs"
     }
 }
 
+struct Metadata {
+    var songCount: Int
+    var albumCount: Int
+    var picture: Data?
+}
+
 class ArtistsTableViewController: UITableViewController {
+    static let songCountKey = "songs"
+    static let albumCountKey = "albums"
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var artists = [NSDictionary]()
+    var additionalData = [Metadata]()
     var library: Library?
     
     override func viewDidLoad() {
@@ -61,7 +79,8 @@ class ArtistsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "artistCell", for: indexPath) as! ArtistCell
 
         let result = artists[indexPath.item]
-        cell.setData(result)
+        let metadata = additionalData[indexPath.item]
+        cell.setData(result, metadata)
 
         return cell
     }
@@ -84,8 +103,43 @@ class ArtistsTableViewController: UITableViewController {
         request.returnsDistinctResults = true
         request.sortDescriptors = [NSSortDescriptor(key:SongTable.artistColumnName, ascending: true)]
         request.predicate = NSPredicate(format: "\(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", library.id!)
+        
+        additionalData.removeAll()
+        
         do {
             artists = try ctx.fetch(request) as! [NSDictionary]
+            try artists.forEach { data in
+                if let artistName = data[SongTable.artistColumnName] as? String {
+                    let songsRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
+                    songsRequest.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", artistName, library.id!)
+                    let songCount = try ctx.count(for: songsRequest)
+                    
+                    let albumsRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
+                    albumsRequest.resultType = .dictionaryResultType
+                    albumsRequest.propertiesToFetch = [SongTable.albumColumnName]
+                    albumsRequest.returnsDistinctResults = true
+                    albumsRequest.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", artistName, library.id!)
+                    let albums = try ctx.fetch(albumsRequest)
+                    let albumCount = albums.count
+                    
+                    //ctx.count does not honour the distinct result flag...
+                    //let albumCount = try ctx.count(for: albumsRequest)
+                    
+                    let pictureRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
+                    pictureRequest.resultType = .dictionaryResultType
+                    pictureRequest.propertiesToFetch = [SongTable.pictureColumnName]
+                    pictureRequest.returnsDistinctResults = true
+                    pictureRequest.predicate = NSPredicate(format: "\(SongTable.artistColumnName) = %@ AND \(SongTable.libraryColumnName).\(LibraryTable.idColumnName) = %@", artistName, library.id!)
+                    let pictures = try ctx.fetch(pictureRequest) as! [NSDictionary]
+                    
+                    let metadata = Metadata(songCount: songCount, albumCount: albumCount, picture: pictures[0][SongTable.pictureColumnName] as? Data)
+                    
+                    let i = artists.index(of: data)
+                    if i != nil {
+                        additionalData.insert(metadata, at: i!)
+                    }
+                }
+            }
         }
         catch {
             fatalError("Failed to fetch entities: \(error)")
