@@ -155,6 +155,11 @@ class PlayingViewController: UIViewController {
         
         titleView.text = song.title
         artistView.text = song.artist
+        if let picture = song.picture {
+            imageView.image = UIImage(data: picture)
+        } else {
+            imageView.image = nil
+        }
         
         updatePlayButtonImage(isPlaying())
     }

@@ -168,7 +168,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
         
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Song")
         request.resultType = .managedObjectResultType
-        request.sortDescriptors = [NSSortDescriptor(key:SongTable.titleColumnName, ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(key:SongTable.tracknrColumn, ascending: true)]
         
         if let artist = artist {
             if let album = album {
@@ -234,7 +234,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
             let navController = tabBarController?.selectedViewController as? UINavigationController
             let playController = navController?.topViewController as? PlayingViewController
             
-            let i = songs.index(of: cell.song!)
+            let i = localSongs.index(of: cell.song!)
             
             guard let index = i else {
                 print("Song not found in fetched songs!")
