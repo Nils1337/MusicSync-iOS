@@ -19,6 +19,35 @@ class LibraryCell: UITableViewCell {
         self.library = library
         nameLabel.text = library.name
     }
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        let background = UIView()
+        background.backgroundColor = UIColor.libraryHighlightColor()
+        selectedBackgroundView = background
+    }
+
+    /*override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        if (highlighted) {
+            backgroundColor = UIColor.libraryHighlightColor()
+        } else {
+            backgroundColor = UIColor.clear
+        }
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        if (selected) {
+            backgroundColor = UIColor.libraryHighlightColor()
+        } else {
+            backgroundColor = UIColor.clear
+        }
+    }*/
 }
 
 class DrawerServerCell: UITableViewCell {
@@ -27,28 +56,27 @@ class DrawerServerCell: UITableViewCell {
     
     func setData(_ server: Server) {
         self.server = server
-        nameLabel.text = server.name
+        nameLabel.text = server.name! + " @ " + server.url!
     }
 }
 
 class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
-
-    @IBOutlet weak var headerView: UIImageView!
     
     var data = [Any]()
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    var fetchedController: NSFetchedResultsController<NSFetchRequestResult>?
 
     override func viewDidLoad() {
         
         self.tableView.dataSource = self
         self.tableView.delegate = self
         super.viewDidLoad()
+        navigationItem.title = "Libraries"
         
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizationFailedNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.serverAddedNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
         // Uncomment the following line to preserve selection between presentations
@@ -65,6 +93,18 @@ class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     override func viewWillAppear(_ animated: Bool) {
         loadData()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        //select current library
+        data.enumerated().forEach {
+            if let library = $1 as? Library {
+                if (appDelegate.library?.id! == library.id!) {
+                    let indexPath = IndexPath(row: $0, section: 0)
+                    tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
+                }
+            }
+        }
     }
 
     // MARK: - Table view data source
@@ -86,7 +126,28 @@ class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewD
         return sectionInfo.numberOfObjects*/
         return data.count
     }
-
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if data[indexPath.row] is Library {
+            return 45
+        } else {
+            return 25
+        }
+    }
+/*
+    func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) as? LibraryCell else {
+            return;
+        }
+        cell.backgroundColor = UIColor.libraryHighlightColor()
+    }
+    
+    func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) as? LibraryCell else {
+            return;
+        }
+        cell.backgroundColor = UIColor.clear
+    }*/
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -95,12 +156,13 @@ class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewD
         if let server = object as? Server {
             let cell = tableView.dequeueReusableCell(withIdentifier: "drawerServerCell", for: indexPath) as! DrawerServerCell
             cell.setData(server)
-            cell.selectionStyle = .none
             return cell
         } else if let library = object as? Library {
             let cell = tableView.dequeueReusableCell(withIdentifier: "libraryCell", for: indexPath) as! LibraryCell
             cell.setData(library)
             return cell
+        } else if object is String {
+            return tableView.dequeueReusableCell(withIdentifier: "errorCell", for: indexPath)
         } else {
             fatalError("Attempt to configure cell without managed object")
         }
@@ -117,7 +179,7 @@ class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewD
         do {
             let servers = try ctx.fetch(request) as! [Server]
             data = servers
-            for server: Server in servers {
+            for server in servers {
                 let libRequest  = NSFetchRequest<NSFetchRequestResult>(entityName: "Library")
                 libRequest.resultType = .managedObjectResultType
                 libRequest.sortDescriptors = [NSSortDescriptor(key: LibraryTable.nameColumnName, ascending: true)]
@@ -125,6 +187,14 @@ class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewD
                 let libraries = try ctx.fetch(libRequest) as! [Library]
                 libraries.reversed().forEach {
                     data.insert($0, at: 1 + data.index(where: {
+                        s in
+                        return s as? Server == server
+                    })!)
+                }
+                
+                //add error indicator
+                if server.lastSync == .Failure {
+                    data.insert("error", at: 1 + data.index(where: {
                         s in
                         return s as? Server == server
                     })!)
@@ -151,6 +221,58 @@ class LibraryViewController: UIViewController, UITableViewDelegate, UITableViewD
             self.loadData()
         }
     }
+    
+    /*func showSyncError(_ notification: NSNotification) {
+        guard notification.userInfo != nil else {
+            return
+        }
+        let serverName = notification.userInfo!["server_name"] as? String
+        guard serverName != nil else {
+            return
+        }
+        
+        var index = -1
+        data.enumerated().forEach {
+            if let server = $1 as? Server {
+                if (serverName == server.name!) {
+                    index = $0
+                }
+            }
+        }
+        if index > -1 {
+            data.insert("error", at: index + 1)
+            let indexPath = IndexPath(row: index + 1, section: 0)
+            tableView.insertRows(at: [indexPath], with: .automatic)
+        }
+    }
+    
+    func syncSuccess(_ notification: NSNotification) {
+        guard notification.userInfo != nil else {
+            return
+        }
+        let serverName = notification.userInfo!["server_name"] as? String
+        guard serverName != nil else {
+            return
+        }
+        
+        var index = -1
+        data.enumerated().forEach {
+            if let server = $1 as? Server {
+                if (serverName == server.name!) {
+                    index = $0
+                }
+            }
+        }
+        if index > -1 {
+            if index + 1 < data.count && data[index+1] is String {
+                data.remove(at: index + 1)
+                let indexPath = IndexPath(row: index + 1, section: 0)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+        }
+        
+        reload(notification)
+    }*/
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let cell = tableView.cellForRow(at: indexPath) as? LibraryCell else {

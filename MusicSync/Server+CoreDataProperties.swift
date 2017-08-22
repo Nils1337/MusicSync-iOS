@@ -20,6 +20,10 @@ extension Server {
         case Http, Https
     }
     
+    @objc public enum SyncStatus: Int16 {
+        case Success, Failure
+    }
+    
     @NSManaged public var name: String?
     @NSManaged public var path: String?
     @NSManaged public var port: Int16
@@ -27,6 +31,7 @@ extension Server {
     @NSManaged public var prot: Prot
     @NSManaged public var libraries: NSSet?
     @NSManaged public var songs: NSSet?
+    @NSManaged public var lastSync: SyncStatus
 
 }
 

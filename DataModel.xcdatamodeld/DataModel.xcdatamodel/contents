@@ -7,6 +7,7 @@
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Song" inverseName="library" inverseEntity="Song" syncable="YES"/>
     </entity>
     <entity name="Server" representedClassName=".Server" syncable="YES">
+        <attribute name="lastSync" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES">
             <userInfo>
                 <entry key="sync.isPrimaryKey" value="true"/>
@@ -37,7 +38,7 @@
     </entity>
     <elements>
         <element name="Library" positionX="-549" positionY="-6" width="128" height="105"/>
-        <element name="Server" positionX="-281" positionY="9" width="128" height="150"/>
+        <element name="Server" positionX="-281" positionY="9" width="128" height="165"/>
         <element name="Song" positionX="-828" positionY="18" width="128" height="255"/>
     </elements>
 </model>

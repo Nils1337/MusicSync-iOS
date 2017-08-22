@@ -34,6 +34,7 @@ struct LibraryTable {
 
 struct Notifications {
     static let synchronizedNotification = NSNotification.Name("synchronized")
+    static let synchronizationFailedNotification = NSNotification.Name("synchronizationFailed")
     static let serverDeletedNoticiation = NSNotification.Name("serverDeleted")
     static let allDataDeletedNotification = NSNotification.Name("allDataDeleted")
     static let libraryChangedNotification = NSNotification.Name("libraryChanged")

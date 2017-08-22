@@ -39,9 +39,18 @@ class SynchronizeOperation: Operation {
             try getLibraries()
             try getSongs()
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            server!.lastSync = .Success
+            appDelegate.saveContext()
+            let data = ["server_name": server!.name!]
+            NotificationCenter.default.post(name: Notifications.synchronizedNotification, object: nil, userInfo: data)
         }
         catch {
             print("Error during synchronization")
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            server!.lastSync = .Failure
+            appDelegate.saveContext()
+            let data = ["server_name": server!.name!]
+            NotificationCenter.default.post(name: Notifications.synchronizationFailedNotification, object: nil, userInfo: data)
         }
     }
     
@@ -78,7 +87,7 @@ class SynchronizeOperation: Operation {
         task.resume()
         
         guard semaphore.wait(timeout: DispatchTime.now() + .seconds(timeoutInSeconds)) == .success else {
-            throw NSError()
+            throw RuntimeError.Message("Error while waiting for Library synchronization!")
         }
     }
     
@@ -134,7 +143,7 @@ class SynchronizeOperation: Operation {
         task.resume()
         
         guard semaphore.wait(timeout: DispatchTime.now() + .seconds(timeoutInSeconds)) == .success else {
-            throw NSError()
+            throw RuntimeError.Message("Error while waiting for Song synchronization")
         }
     }
     

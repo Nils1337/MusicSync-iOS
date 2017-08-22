@@ -209,9 +209,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func synchronize(with server: Server) {
         let op = SynchronizeOperation(server)
-        op.completionBlock = {
-            NotificationCenter.default.post(name: Notifications.synchronizedNotification, object: nil)
-        }
         
         if self.server == nil {
             self.server = server
