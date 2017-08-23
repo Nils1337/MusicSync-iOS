@@ -103,7 +103,51 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "ServerDetailViewController")
         self.navigationController?.pushViewController(vc!, animated: true)
     }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
 
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let cell = tableView.cellForRow(at: indexPath) as! ServerCell
+            
+            let server = cell.server!
+            
+            let alert = UIAlertController(title: "Delete server", message: "Are you sure you want to delete server '\(server.name!)' and all its metadata?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title:"Cancel", style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "Yes", style: .default) { action in
+                if self.appDelegate.synchronizeQueue.operationCount > 0 || DownloadManager.shared.downloads.count > 0 {
+                    let alert = UIAlertController(title: "Error", message: "Wait for synchronizations and downloads to finish!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                } else {
+                    let ctx = self.appDelegate.dataStack.mainContext
+                    
+                    self.appDelegate.deleteFiles(of: server)
+                    
+                    let userInfo = ["server_name": server.name!]
+                    NotificationCenter.default.post(name: Notifications.serverDeletedNoticiation, object: nil, userInfo: userInfo)
+                    //this also deletes all libraries and songs of that server because
+                    //delete rule is 'cascading'
+                    ctx.delete(server)
+                    
+                    if (self.appDelegate.server == server) {
+                        self.appDelegate.server = nil
+                        self.appDelegate.library = nil
+                    }
+                    self.appDelegate.saveContext()
+                }
+            })
+            self.present(alert, animated: true, completion: nil)
+            
+
+            
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        } else if editingStyle == .insert {
+            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+        }
+    }
     
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

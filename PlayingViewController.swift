@@ -26,6 +26,8 @@ class PlayingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        NotificationCenter.default.addObserver(self, selector: #selector(serverDeleted(_:)), name: Notifications.serverDeletedNoticiation, object: nil)
+        
         // Do any additional setup after loading the view.
     }
     
@@ -74,6 +76,15 @@ class PlayingViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    func serverDeleted(_ notification: Notification) {
+        if let serverName = notification.userInfo?["server_name"] as? String, songs.count > 0, songs[0].server!.name! == serverName {
+            player.pause()
+            imageView.image = nil
+            progressView.setProgress(0, animated: true)
+        }
+    }
+    
     
     @IBAction func playOrPause(_ sender: Any) {
         if (isPlaying()) {

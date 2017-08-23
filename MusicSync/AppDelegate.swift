@@ -27,6 +27,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var centerViewController: UIViewController?
     
     var server: Server? {
+        /*
+        willSet(newValue) {
+            if (newValue == nil) {
+                //cancel all current synchronizations with server if it is deleted
+                for operation in synchronizeQueue.operations {
+                    if let op = operation as? SynchronizeOperation, op.server == server {
+                        op.cancel()
+                    }
+                }
+                
+                //cancel all current downloads from server if it is deleted
+                if server != nil {
+                    DownloadManager.shared.cancelDownloads(of: server!)
+                }
+            }
+        }*/
         didSet(oldValue) {
             NotificationCenter.default.post(name: Notifications.serverChangedNotification, object: nil)
         }
@@ -132,33 +148,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         block?(drawerController, drawerSide, percentVisible)
     }
     
-    private func addSomeData() {
-        
-        let ctx = dataStack.mainContext
-        
-        let song1 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
-        let song2 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
-        let song3 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
-        let song4 = NSEntityDescription.insertNewObject(forEntityName: "Song", into: ctx) as! Song
-        
-        song1.title = "Song1"
-        song2.title = "Song2"
-        song3.title = "Song3"
-        song4.title = "Song4"
-        
-        song1.artist = "Artist1"
-        song2.artist = "Artist2"
-        song3.artist = "Artist3"
-        song4.artist = "Artist1"
-        
-        song1.album = "Album1"
-        song2.album = "Album2"
-        song3.album = "Album3"
-        song4.album = "Album1"
-        
-        saveContext()
-    }
-    
     func synchronizeWithCurrentServer() {
         if library == nil {
             let operation = BlockOperation {
@@ -222,6 +211,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func deleteAllData() {
+        let request: NSFetchRequest<Server> = Server.fetchRequest()
+        do {
+            let servers = try dataStack.mainContext.fetch(request)
+            for server in servers {
+                deleteFiles(of: server)
+                let userInfo = ["server_name": server.name!]
+                NotificationCenter.default.post(name: Notifications.serverDeletedNoticiation, object: nil, userInfo: userInfo)
+            }
+        } catch {
+            print("Error fetching servers!")
+        }
+        
         dataStack.drop()
         server = nil
         library = nil
@@ -270,6 +271,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+    }
+    
+    func deleteFiles(of server: Server) {
+        let request: NSFetchRequest<Song> = Song.fetchRequest()
+        request.predicate = NSPredicate(format: "\(LibraryTable.serverColumnName).\(ServerTable.nameColumnName) = %@", server.name!)
+        do {
+            let songs = try dataStack.mainContext.fetch(request)
+            let fileManager = FileManager.default
+            for song in songs {
+                if let file = song.filename {
+                    do {
+                        try fileManager.removeItem(atPath: file)
+                    } catch {
+                        print("Error deleting song file!")
+                    }
+                }
+            }
+        } catch {
+            print("error fetching songs of server!")
+        }
     }
     
     // MARK: - Core Data stack

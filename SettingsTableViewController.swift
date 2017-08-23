@@ -49,8 +49,21 @@ class SettingsTableViewController: UITableViewController {
             appDelegate.synchronizeWithCurrentServer()
         }
         if (cell == deleteDataCell) {
-            appDelegate.deleteAllData()
+            let alert = UIAlertController(title: "Delete Local Data", message: "Are you sure you want to delete all local data?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "Yes", style: .default) {action in
+                if self.appDelegate.synchronizeQueue.operationCount > 0 || DownloadManager.shared.downloads.count > 0 {
+                    let alert = UIAlertController(title: "Error", message: "Wait for synchronizations and downloads to finish!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                } else {
+                    self.appDelegate.deleteAllData()
+                }
+            })
+            self.present(alert, animated: true, completion: nil)
         }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
     /*

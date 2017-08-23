@@ -87,7 +87,8 @@ class SynchronizeOperation: Operation {
         task.resume()
         
         guard semaphore.wait(timeout: DispatchTime.now() + .seconds(timeoutInSeconds)) == .success else {
-            throw RuntimeError.Message("Error while waiting for Library synchronization!")
+            task.cancel()
+            throw RuntimeError.Message("Error while waiting for Library synchronization")
         }
     }
     
@@ -143,6 +144,7 @@ class SynchronizeOperation: Operation {
         task.resume()
         
         guard semaphore.wait(timeout: DispatchTime.now() + .seconds(timeoutInSeconds)) == .success else {
+            task.cancel()
             throw RuntimeError.Message("Error while waiting for Song synchronization")
         }
     }
@@ -215,7 +217,10 @@ class SongDelegate: SyncDelegate {
         var update = json
         
         //add server id to library entity
-        update.updateValue(syncOp.server!.name!, forKey: SongTable.serverColumnName + "_id")
+        guard let serverName = syncOp.server?.name else {
+            return json;
+        }
+        update.updateValue(serverName, forKey: SongTable.serverColumnName + "_id")
         
         update.updateValue(Song.DownloadStatus.Remote.rawValue, forKey: SongTable.downloadStatusColumnName)
         if let library = update[SongTable.libraryColumnName] {
@@ -244,9 +249,11 @@ class SongDelegate: SyncDelegate {
         var update = json;
         
         //update server
-        if let server = song.server {
-            update.updateValue(server.name!, forKey: SongTable.serverColumnName + "_id")
+        guard let serverName = song.server?.name else {
+            return json;
         }
+        
+        update.updateValue(serverName, forKey: SongTable.serverColumnName + "_id")
         
         //update library
         if let library = update[SongTable.libraryColumnName] {
