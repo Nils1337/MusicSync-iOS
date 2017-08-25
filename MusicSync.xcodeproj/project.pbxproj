@@ -1118,6 +1118,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BCA9937EB65512E4D4EFF4CB /* Pods-MusicSync.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 8QFLX5HN9Q;
@@ -1136,6 +1137,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7C93FFADEECF283D5B7BC454 /* Pods-MusicSync.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 8QFLX5HN9Q;

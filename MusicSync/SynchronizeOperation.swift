@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Sync
+import CocoaLumberjack
 
 class SynchronizeOperation: Operation {
     
@@ -31,7 +32,7 @@ class SynchronizeOperation: Operation {
     
     override func main() {
         guard server != nil else {
-            print("Current Server is null!")
+            DDLogError("Current Server is null!")
             return
         }
         do {
@@ -45,7 +46,7 @@ class SynchronizeOperation: Operation {
             NotificationCenter.default.post(name: Notifications.synchronizedNotification, object: nil, userInfo: data)
         }
         catch {
-            print("Error during synchronization")
+            DDLogError("Error during synchronization")
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
             server!.lastSync = .Failure
             appDelegate.saveContext()
@@ -65,13 +66,13 @@ class SynchronizeOperation: Operation {
             
             guard error == nil else {
                 //TODO
-                print(error!.localizedDescription)
+                DDLogError(error!.localizedDescription)
                 return
             }
             
             guard data != nil else {
                 //TODO
-                print("no data received from server!")
+                DDLogError("no data received from server!")
                 return
             }
             
@@ -94,7 +95,7 @@ class SynchronizeOperation: Operation {
     
     func saveLibraries(_ data: Data) {
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
-            print("Error during JSON Deserialization!")
+            DDLogError("Error during JSON Deserialization!")
             return
         }
 
@@ -108,7 +109,7 @@ class SynchronizeOperation: Operation {
         librarySync?.start()
         librarySync?.waitUntilFinished()
         
-        print("Libraries successfully synced!")
+        DDLogInfo("Libraries successfully synced!")
     }
     
 
@@ -123,13 +124,13 @@ class SynchronizeOperation: Operation {
             
             guard error == nil else {
                 //TODO
-                print(error!.localizedDescription)
+                DDLogError(error!.localizedDescription)
                 return
             }
             
             guard data != nil else {
                 //TODO
-                print("no data received from server!")
+                DDLogError("no data received from server!")
                 return
             }
             
@@ -151,7 +152,7 @@ class SynchronizeOperation: Operation {
     
     func saveSongs(_ data: Data) {
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
-            print("Error during JSON Deserialization!")
+            DDLogError("Error during JSON Deserialization!")
             return
         }
         
@@ -164,7 +165,7 @@ class SynchronizeOperation: Operation {
         songSync?.start()
         songSync?.waitUntilFinished()
 
-        print("Songs successfully synced!")
+        DDLogInfo("Songs successfully synced!")
 
     }
 }

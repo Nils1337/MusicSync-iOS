@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import CocoaLumberjack
 
 protocol DataCell {
     var song: Song? { get set }
@@ -206,12 +207,12 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
         if cell is RemoteSongCell {
             
             guard let song = cell.song else {
-                print("cell has no song!")
+                DDLogError("cell has no song!")
                 return
             }
             
             guard let server = appDelegate.server else {
-                print("no server for downloading available!")
+                DDLogError("no server for downloading available!")
                 return
             }
             
@@ -237,7 +238,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
             let i = localSongs.index(of: cell.song!)
             
             guard let index = i else {
-                print("Song not found in fetched songs!")
+                DDLogError("Song not found in fetched songs!")
                 return
             }
             
@@ -298,7 +299,7 @@ class SongsTableViewController: UITableViewController, DownloadDelegate {
                 try fileManager.removeItem(atPath: cell.song!.filename!)
             }
             catch {
-                print(error.localizedDescription)
+                DDLogError(error.localizedDescription)
             }
             
             appDelegate.saveContext()

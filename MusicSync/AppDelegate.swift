@@ -12,14 +12,18 @@ import CoreData
 import Sync
 import ReachabilitySwift
 import AVFoundation
+import CocoaLumberjack
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    static let serverKey = "server"
+    static let libraryKey = "library"
+    
     let synchronizeQueue = OperationQueue()
     let dataFetchQueue = OperationQueue()
     let reachability = Reachability()!
 
+    //takes care of the core data stack
     let dataStack = DataStack(modelName: "DataModel")
     
     var window: UIWindow?
@@ -27,22 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var centerViewController: UIViewController?
     
     var server: Server? {
-        /*
-        willSet(newValue) {
-            if (newValue == nil) {
-                //cancel all current synchronizations with server if it is deleted
-                for operation in synchronizeQueue.operations {
-                    if let op = operation as? SynchronizeOperation, op.server == server {
-                        op.cancel()
-                    }
-                }
-                
-                //cancel all current downloads from server if it is deleted
-                if server != nil {
-                    DownloadManager.shared.cancelDownloads(of: server!)
-                }
-            }
-        }*/
         didSet(oldValue) {
             NotificationCenter.default.post(name: Notifications.serverChangedNotification, object: nil)
         }
@@ -52,54 +40,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NotificationCenter.default.post(name: Notifications.libraryChangedNotification, object: nil)
         }
     }
+    
+    
+    // MARK - Lifecycle callbacks
 
-    let serverKey = "server"
-    let libraryKey = "library"
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         
-        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        initDrawer()
+        customizeAppearance()
+        initLogging()
+        configureAudio()
         
-        centerViewController = mainStoryboard.instantiateViewController(withIdentifier: "MainViewController") as UIViewController
-        
-        let drawerViewController = mainStoryboard.instantiateViewController(withIdentifier: "DrawerController") as UIViewController
-        
-        let nav = UINavigationController()
-        nav.setViewControllers([drawerViewController], animated: false)
-        nav.title = "Libraries"
-        
-        drawerContainer = MMDrawerController(center: centerViewController, leftDrawerViewController: nav)
-        drawerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.bezelPanningCenterView
-        drawerContainer?.closeDrawerGestureModeMask = [MMCloseDrawerGestureMode.panningCenterView, MMCloseDrawerGestureMode.panningDrawerView, MMCloseDrawerGestureMode.tapCenterView]
-        drawerContainer?.showsShadow = false
-        drawerContainer?.setDrawerVisualStateBlock(animateDrawer)
-        drawerContainer?.setMaximumLeftDrawerWidth(200, animated: true, completion: nil)
-
-        window!.rootViewController = drawerContainer
-        window!.makeKeyAndVisible()
-        
-        
-        UINavigationBar.appearance().barTintColor = UIColor.navBarColor()
-        UINavigationBar.appearance().isTranslucent = false
-        UINavigationBar.appearance().tintColor = UIColor.white
-        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
-        
-        /*let defaults = UserDefaults.standard
-         let serverName = defaults.object(forKey: serverKey)
-         let libraryId = defaults.object(forKey: libraryKey)*/
         //deleteAllData()
         
         NotificationCenter.default.addObserver(self, selector: #selector(trySelectLibrary), name: Notifications.synchronizedNotification, object: nil)
-        
-        //configure audio session
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(AVAudioSessionCategoryPlayback)
-        }
-        catch {
-            print("Setting category of AVAudioSession failed!")
-        }
         
         return true
     }
@@ -113,8 +68,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         let defaults = UserDefaults.standard
-        defaults.set(server?.name!, forKey: serverKey)
-        defaults.set(library?.id!, forKey: libraryKey)
+        defaults.set(server?.name!, forKey: AppDelegate.serverKey)
+        defaults.set(library?.id!, forKey: AppDelegate.libraryKey)
    }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -134,6 +89,61 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
         //gets called when application is started by background session that is finished downloading
         completionHandler()
+    }
+    
+    
+    // MARK - Other Functions
+    
+    func configureAudio() {
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(AVAudioSessionCategoryPlayback)
+        }
+        catch {
+            DDLogError("Setting category of AVAudioSession failed!")
+        }
+    }
+    
+    func initLogging() {
+        #if DEBUG
+            defaultDebugLevel = DDLogLevel.verbose
+        #else
+            defaultDebugLevel = DDLogLevel.warning
+        #endif
+        
+        //add xcode console logger
+        DDLog.add(DDTTYLogger.sharedInstance)
+        //add apple system logger
+        DDLog.add(DDASLLogger.sharedInstance)
+    }
+    
+    func customizeAppearance() {
+        UINavigationBar.appearance().barTintColor = UIColor.navBarColor()
+        UINavigationBar.appearance().isTranslucent = false
+        UINavigationBar.appearance().tintColor = UIColor.white
+        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+    }
+    
+    func initDrawer() {
+        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        centerViewController = mainStoryboard.instantiateViewController(withIdentifier: "MainViewController") as UIViewController
+        
+        let drawerViewController = mainStoryboard.instantiateViewController(withIdentifier: "DrawerController") as UIViewController
+        
+        let nav = UINavigationController()
+        nav.setViewControllers([drawerViewController], animated: false)
+        nav.title = "Libraries"
+        
+        drawerContainer = MMDrawerController(center: centerViewController, leftDrawerViewController: nav)
+        drawerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.bezelPanningCenterView
+        drawerContainer?.closeDrawerGestureModeMask = [MMCloseDrawerGestureMode.panningCenterView, MMCloseDrawerGestureMode.panningDrawerView, MMCloseDrawerGestureMode.tapCenterView]
+        drawerContainer?.showsShadow = false
+        drawerContainer?.setDrawerVisualStateBlock(animateDrawer)
+        drawerContainer?.setMaximumLeftDrawerWidth(200, animated: true, completion: nil)
+        
+        window!.rootViewController = drawerContainer
+        window!.makeKeyAndVisible()
     }
     
     @objc func onDrawerButtonPressed() {
@@ -175,7 +185,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         else {
             //if library is not nil, server should not be nil as well
             guard let server = server else {
-                print("Could not synchronize with current server because library is set but server is nil!")
+                DDLogWarn("Could not synchronize with current server because library is set but server is nil!")
                 return
             }
             synchronize(with: server)
@@ -203,7 +213,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.server = server
         }
         
-        print("Synchronization started with server: " + server.name!)
+        DDLogInfo("Synchronization started with server: " + server.name!)
         
         synchronizeQueue.addOperation(op)
         
@@ -220,7 +230,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 NotificationCenter.default.post(name: Notifications.serverDeletedNoticiation, object: nil, userInfo: userInfo)
             }
         } catch {
-            print("Error fetching servers!")
+            DDLogError("Error fetching servers!")
         }
         
         dataStack.drop()
@@ -234,8 +244,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func loadSavedData() {
         let defaults = UserDefaults.standard
-        let serverName = defaults.object(forKey: serverKey) as? String
-        let libraryId = defaults.object(forKey: libraryKey) as? String
+        let serverName = defaults.object(forKey: AppDelegate.serverKey) as? String
+        let libraryId = defaults.object(forKey: AppDelegate.libraryKey) as? String
         
         if serverName != nil {
             let request: NSFetchRequest<Server> = Server.fetchRequest()
@@ -249,7 +259,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         self.server = servers[0]
                     }
                 } catch {
-                    print("error fetching saved server!")
+                    DDLogError("error fetching saved server!")
                 }
             }
         }
@@ -266,7 +276,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         self.library = libraries[0]
                     }
                 } catch {
-                    print("error fetching saved server!")
+                    DDLogError("error fetching saved server!")
                 }
             }
         }
@@ -284,65 +294,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     do {
                         try fileManager.removeItem(atPath: file)
                     } catch {
-                        print("Error deleting song file!")
+                        DDLogError("Error deleting song file!")
                     }
                 }
             }
         } catch {
-            print("error fetching songs of server!")
+            DDLogError("error fetching songs of server!")
         }
     }
     
-    // MARK: - Core Data stack
-    // no PersistenceContext because I want to support iOS 9
-/*
-    lazy var applicationDocumentsDirectory: URL = {
-        // The directory the application uses to store the Core Data store file. This code uses a directory named "com.cadiridris.coreDataTemplate" in the application's documents Application Support directory.
-        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return urls[urls.count-1]
-    }()
-    
-    lazy var managedObjectModel: NSManagedObjectModel = {
-        // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-        let modelURL = Bundle.main.url(forResource: "DataModel", withExtension: "momd")!
-        return NSManagedObjectModel(contentsOf: modelURL)!
-    }()
-    
-    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
-        // The persistent store coordinator for the application. This implementation creates and returns a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
-        // Create the coordinator and store
-        let coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-        let url = self.applicationDocumentsDirectory.appendingPathComponent("SingleViewCoreData.sqlite")
-        var failureReason = "There was an error creating or loading the application's saved data."
-        do {
-            try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
-        } catch {
-            // Report any error we got.
-            var dict = [String: AnyObject]()
-            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data" as AnyObject?
-            dict[NSLocalizedFailureReasonErrorKey] = failureReason as AnyObject?
-            
-            dict[NSUnderlyingErrorKey] = error as NSError
-            let wrappedError = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
-            // Replace this with code to handle the error appropriately.
-            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            NSLog("Unresolved error \(wrappedError), \(wrappedError.userInfo)")
-            abort()
-        }
-        
-        return coordinator
-    }()
-    
-    lazy var managedObjectContext: NSManagedObjectContext = {
-        // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) This property is optional since there are legitimate error conditions that could cause the creation of the context to fail.
-        let coordinator = self.persistentStoreCoordinator
-        var managedObjectContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-        managedObjectContext.persistentStoreCoordinator = coordinator
-        return managedObjectContext
-    }()
-    
     // MARK: - Core Data Saving support
-*/
+    
     func saveContext () {
         if dataStack.mainContext.hasChanges {
             do {

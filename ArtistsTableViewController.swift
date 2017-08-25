@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import CocoaLumberjack
 
 class ArtistCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
@@ -44,6 +45,7 @@ class ArtistsTableViewController: UITableViewController {
     var library: Library?
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         navigationItem.title = "All Artists"
         library = appDelegate.library

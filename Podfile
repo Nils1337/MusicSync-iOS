@@ -10,6 +10,7 @@ target 'MusicSync' do
   pod 'Sync', :git => 'https://github.com/Nils1337/Sync.git'
   pod 'ReachabilitySwift'
   pod 'Validator'
+  pod 'CocoaLumberjack/Swift'
   
   target 'MusicSyncTests' do
     #inherit! :search_paths‚

@@ -9,6 +9,7 @@
 import Foundation
 import ReachabilitySwift
 import UIKit
+import CocoaLumberjack
 
 protocol DownloadDelegate {
     func downloadFinished(_ song: Download)
@@ -42,7 +43,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
             try appDelegate.reachability.startNotifier()
         }
         catch {
-            print("could not start reachability notifier!")
+            DDLogWarn("could not start reachability notifier!")
         }
     }
     
@@ -57,7 +58,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         appDelegate.saveContext()
         
         if downloads.count == 1 {
-            print("starting download of song \(song.title!)")
+            DDLogInfo("starting download of song \(song.title!)")
             if (appDelegate.isWifiConnected()) {
                 download.resume()
             }
@@ -91,11 +92,11 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         
         let download = downloads[0]
 
-        print("download of song \(download.song.title!) finished")
+        DDLogInfo("download of song \(download.song.title!) finished")
         downloads.remove(at: 0)
         if downloads.count > 0 {
             let download = downloads[0]
-            print("starting download of song \(download.song.title!)")
+            DDLogInfo("starting download of song \(download.song.title!)")
             download.task.resume()
         }
         
@@ -148,7 +149,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
             
             download.song.downloadStatus = .Local
             download.song.filename = libUrl.lastPathComponent + "/" + fileUrl.lastPathComponent
-            print(download.song.filename!)
+            DDLogVerbose("Saved song to file " + download.song.filename!)
 
             appDelegate.saveContext()
             

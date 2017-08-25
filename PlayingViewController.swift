@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import CocoaLumberjack
 
 class PlayingViewController: UIViewController {
     
@@ -40,7 +41,7 @@ class PlayingViewController: UIViewController {
             observerToken = player.addPeriodicTimeObserver(forInterval: interval, queue: DispatchQueue.main) {
                 [weak self] (time: CMTime) in
             
-                print(time)
+                DDLogVerbose("Received progress update: \(time.seconds)")
             
                 guard self != nil else {
                     return;
@@ -137,22 +138,20 @@ class PlayingViewController: UIViewController {
         do {
             dirUrl = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         } catch {
-            print("Document directory could not be accessed!")
+            DDLogError("Document directory could not be accessed!")
             return
         }
         
         songs.forEach {
             let item = AVPlayerItem(url: dirUrl!.appendingPathComponent($0.filename!))
-            print($0.filename!)
             items.append(item)
         }
         index = 0
-        //player = AVPlayer()
         
         items[index].addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.new], context: nil)
-        print(items[index].status.rawValue)
+        
+        DDLogDebug("Setting item of AVAudioPlayer: " + songs[index].filename!)
         player.replaceCurrentItem(with: items[index])
-        //player.play()
     }
     
     func updateView(_ item: AVPlayerItem) {
