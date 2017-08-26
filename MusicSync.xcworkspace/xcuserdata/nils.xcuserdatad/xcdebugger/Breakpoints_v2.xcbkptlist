@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MusicSync/AppDelegate.swift"
-            timestampString = "525362291.199512"
+            timestampString = "525403491.688554"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "74"
-            endingLineNumber = "74"
+            startingLineNumber = "77"
+            endingLineNumber = "77"
             landmarkName = "AppDelegate"
             landmarkType = "3">
          </BreakpointContent>
@@ -1405,7 +1405,7 @@
                   moduleName = "MusicSync"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/nils/Desktop/MusicSync/MusicSync/SynchronizeOperation.swift"
-                  timestampString = "525401694.081252"
+                  timestampString = "525403584.205759"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "61"
@@ -1420,7 +1420,7 @@
                   moduleName = "MusicSync"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/nils/Desktop/MusicSync/MusicSync/SynchronizeOperation.swift"
-                  timestampString = "525401694.097855"
+                  timestampString = "525403584.215367"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "61"
@@ -1722,11 +1722,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MusicSync/AppDelegate.swift"
-            timestampString = "525365162.023283"
+            timestampString = "525403491.688554"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "287"
-            endingLineNumber = "287"
+            startingLineNumber = "290"
+            endingLineNumber = "290"
             landmarkName = "deleteFiles(of:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1856,6 +1856,38 @@
             startingLineNumber = "196"
             endingLineNumber = "196"
             landmarkName = "insert(_:willInsert:in:parent:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MusicSync/AppDelegate.swift"
+            timestampString = "525403476.623652"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
+            landmarkName = "applicationDidEnterBackground(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MusicSync/AppDelegate.swift"
+            timestampString = "525403623.542405"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
+            landmarkName = "applicationWillTerminate(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
