@@ -228,7 +228,9 @@ class ServersTableViewController: UITableViewController, NSFetchedResultsControl
             default: server!.prot = .Https
             }
             
+            //make sure server exists in background context
             appDelegate.saveContext()
+            
             if adding {
                 NotificationCenter.default.post(name: Notifications.serverAddedNotification, object: server)
             }

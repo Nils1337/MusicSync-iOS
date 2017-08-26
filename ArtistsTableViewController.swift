@@ -49,6 +49,9 @@ class ArtistsTableViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.title = "All Artists"
         library = appDelegate.library
+        
+        loadData()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
        // Uncomment the following line to preserve selection between presentations
@@ -58,9 +61,6 @@ class ArtistsTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        loadData()
-    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -143,7 +143,7 @@ class ArtistsTableViewController: UITableViewController {
             }
         }
         catch {
-            fatalError("Failed to fetch entities: \(error)")
+            DDLogError("Failed to fetch entities: \(error)")
         }
         self.tableView.reloadData()
     }

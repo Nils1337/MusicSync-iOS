@@ -55,7 +55,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
         downloads.append(Download(song: song, task: download))
         
         song.downloadStatus = .Downloading
-        appDelegate.saveContext()
+        //appDelegate.saveContext()
         
         if downloads.count == 1 {
             DDLogInfo("starting download of song \(song.title!)")
@@ -151,7 +151,7 @@ class DownloadManager: NSObject, URLSessionDownloadDelegate {
             download.song.filename = libUrl.lastPathComponent + "/" + fileUrl.lastPathComponent
             DDLogVerbose("Saved song to file " + download.song.filename!)
 
-            appDelegate.saveContext()
+            //appDelegate.saveContext()
             
             delegate?.downloadFinished(download)
         }

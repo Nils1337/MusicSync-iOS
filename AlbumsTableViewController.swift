@@ -44,7 +44,6 @@ class AlbumsTableViewController: UITableViewController {
         library = appDelegate.library
         loadData()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.libraryChangedNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: Notifications.synchronizedNotification, object: nil)
 
         // Uncomment the following line to preserve selection between presentations

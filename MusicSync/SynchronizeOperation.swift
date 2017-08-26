@@ -17,7 +17,7 @@ class SynchronizeOperation: Operation {
     let libraryQueue = OperationQueue()
     let songQueue = OperationQueue()
     let semaphore = DispatchSemaphore(value: 0)
-    let timeoutInSeconds = 10;
+    let timeoutInSeconds = 30;
     
     let songUrl = "/songs"
     let libraryUrl = "/libraries"
@@ -41,7 +41,19 @@ class SynchronizeOperation: Operation {
             try getSongs()
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
             server!.lastSync = .Success
-            appDelegate.saveContext()
+            //appDelegate.saveContext()
+            /*appDelegate.dataStack.performInNewBackgroundContext({managedObjectContext in
+                do {
+                    let server = try managedObjectContext.fetch(self.server!.objectID, inEntityNamed: "Server") as? Server
+                    if server != nil {
+                        server!.lastSync = .Success
+                        try managedObjectContext.save()
+                    }
+                } catch {
+                        
+                }
+            
+            })*/
             let data = ["server_name": server!.name!]
             NotificationCenter.default.post(name: Notifications.synchronizedNotification, object: nil, userInfo: data)
         }
@@ -49,7 +61,7 @@ class SynchronizeOperation: Operation {
             DDLogError("Error during synchronization")
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
             server!.lastSync = .Failure
-            appDelegate.saveContext()
+            //appDelegate.saveContext()
             let data = ["server_name": server!.name!]
             NotificationCenter.default.post(name: Notifications.synchronizationFailedNotification, object: nil, userInfo: data)
         }
